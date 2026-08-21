@@ -165,11 +165,15 @@ WorldSimSeedは単独の教育・実験ツールとして成立させつつ、�
 - OSSライセンス、README、CONTRIBUTING、SECURITY等の公開準備
 - パフォーマンス上限と安全な式評価方式
 
+## Research
+
+- [類似OSS・製品・研究環境の調査と暫定判断（2026-08-22）](docs/research/2026-08-22-simulation-landscape.md)
+
 ## Next starting point
 
-**次回はまず「類似OSS・製品調査」のIssueから開始する。**
+**次回は [Issue #2: Design: v0.1 world spec / DSL を定義する](https://github.com/yo4e/WorldSimSeed/issues/2) から開始する。**
 
-調査結果を踏まえて、既存ツールを使うべきか、WorldSimSeedとして独自実装する価値があるかを判断し、その後v0.1仕様を決める。
+調査の暫定判断は、既存の汎用ABMを再実装・直接wrapするのではなく、AI可読なworld spec、seed固定の再現実行、observerとtrace、Web標準での埋め込みに限定して独自実装することである。Issue #2では、この判断を検証する最小world specとrun manifestを定義する。
 
 ---
 
