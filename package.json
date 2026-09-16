@@ -1,0 +1,24 @@
+{
+  "name": "worldsimseed",
+  "version": "0.1.0-dev.0",
+  "private": true,
+  "type": "module",
+  "description": "Small deterministic simulation runtime for data-defined worlds.",
+  "license": "MIT",
+  "bin": {
+    "worldsimseed": "./dist/src/cli.js"
+  },
+  "exports": {
+    ".": "./dist/src/index.js",
+    "./spec": "./dist/src/spec/index.js",
+    "./core": "./dist/src/core/index.js",
+    "./runner": "./dist/src/runner/index.js"
+  },
+  "types": "./dist/src/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build && node --test dist/test/*.test.js",
+    "demo": "npm run build && node dist/src/cli.js run examples/talent-luck.world.yaml --seed 42"
+  }
+}
