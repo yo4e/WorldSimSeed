@@ -1,0 +1,296 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://worldsimseed.invalid/schemas/world-spec-v0.1.schema.json",
+  "title": "WorldSimSeed world spec v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["specVersion", "id", "time", "events", "observers"],
+  "properties": {
+    "specVersion": { "const": "0.1" },
+    "id": { "$ref": "#/$defs/id" },
+    "title": { "type": "string" },
+    "description": { "type": "string" },
+    "parameters": {
+      "type": "object",
+      "propertyNames": { "$ref": "#/$defs/safeName" },
+      "additionalProperties": { "$ref": "#/$defs/parameter" },
+      "default": {}
+    },
+    "time": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["steps"],
+      "properties": {
+        "steps": { "type": "integer", "minimum": 1 },
+        "label": { "type": "string" }
+      }
+    },
+    "world": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state"],
+      "properties": {
+        "state": { "$ref": "#/$defs/stateMap" }
+      }
+    },
+    "agents": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["count", "state"],
+      "properties": {
+        "count": { "type": "integer", "minimum": 1 },
+        "state": { "$ref": "#/$defs/stateMap" }
+      }
+    },
+    "events": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/event" }
+    },
+    "observers": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/observer" }
+    }
+  },
+  "anyOf": [
+    { "required": ["world"] },
+    { "required": ["agents"] }
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+    },
+    "safeName": {
+      "type": "string",
+      "pattern": "^(?!__proto__$)(?!prototype$)(?!constructor$)[A-Za-z_][A-Za-z0-9_]*$"
+    },
+    "scalar": {
+      "type": ["number", "boolean"]
+    },
+    "exprOrScalar": {
+      "oneOf": [
+        { "$ref": "#/$defs/scalar" },
+        { "type": "string", "minLength": 1 }
+      ]
+    },
+    "parameter": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "default"],
+          "properties": {
+            "type": { "const": "number" },
+            "default": { "type": "number" },
+            "min": { "type": "number" },
+            "max": { "type": "number" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "default"],
+          "properties": {
+            "type": { "const": "boolean" },
+            "default": { "type": "boolean" }
+          }
+        }
+      ]
+    },
+    "stateMap": {
+      "type": "object",
+      "propertyNames": { "$ref": "#/$defs/safeName" },
+      "additionalProperties": { "$ref": "#/$defs/stateField" }
+    },
+    "stateField": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "init"],
+          "properties": {
+            "type": { "const": "number" },
+            "mutable": { "type": "boolean", "default": false },
+            "init": {
+              "oneOf": [
+                { "type": "number" },
+                { "$ref": "#/$defs/uniform" },
+                { "$ref": "#/$defs/normal" }
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "init"],
+          "properties": {
+            "type": { "const": "boolean" },
+            "mutable": { "type": "boolean", "default": false },
+            "init": {
+              "oneOf": [
+                { "type": "boolean" },
+                { "$ref": "#/$defs/bernoulli" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "uniform": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["distribution", "min", "max"],
+      "properties": {
+        "distribution": { "const": "uniform" },
+        "min": { "type": "number" },
+        "max": { "type": "number" }
+      }
+    },
+    "normal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["distribution", "mean", "sd"],
+      "properties": {
+        "distribution": { "const": "normal" },
+        "mean": { "type": "number" },
+        "sd": { "type": "number", "exclusiveMinimum": 0 },
+        "clamp": {
+          "type": "array",
+          "prefixItems": [
+            { "type": "number" },
+            { "type": "number" }
+          ],
+          "items": false,
+          "minItems": 2,
+          "maxItems": 2
+        }
+      }
+    },
+    "bernoulli": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["distribution", "p"],
+      "properties": {
+        "distribution": { "const": "bernoulli" },
+        "p": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "scope", "effects"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "scope": { "enum": ["agent", "world"] },
+        "condition": { "type": "string", "minLength": 1 },
+        "chance": {
+          "oneOf": [
+            { "type": "number", "minimum": 0, "maximum": 1 },
+            { "type": "string", "minLength": 1 }
+          ]
+        },
+        "effects": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/effect" }
+        }
+      }
+    },
+    "effect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target", "op", "value"],
+      "properties": {
+        "target": {
+          "type": "string",
+          "pattern": "^(agent|world)\\.[A-Za-z_][A-Za-z0-9_]*$"
+        },
+        "op": { "enum": ["set", "add", "multiply"] },
+        "value": { "$ref": "#/$defs/exprOrScalar" }
+      }
+    },
+    "record": {
+      "enum": ["final", "everyStep"]
+    },
+    "sourceObserver": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "source"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "type": { "enum": ["value", "mean", "min", "max", "gini"] },
+        "source": {
+          "type": "string",
+          "pattern": "^(agent|world)\\.[A-Za-z_][A-Za-z0-9_]*$"
+        },
+        "record": { "$ref": "#/$defs/record" }
+      }
+    },
+    "observer": {
+      "oneOf": [
+        { "$ref": "#/$defs/sourceObserver" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "type", "scope"],
+          "properties": {
+            "id": { "$ref": "#/$defs/id" },
+            "type": { "const": "count" },
+            "scope": { "const": "agent" },
+            "condition": { "type": "string", "minLength": 1 },
+            "record": { "$ref": "#/$defs/record" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "type", "source", "bins"],
+          "properties": {
+            "id": { "$ref": "#/$defs/id" },
+            "type": { "const": "histogram" },
+            "source": {
+              "type": "string",
+              "pattern": "^agent\\.[A-Za-z_][A-Za-z0-9_]*$"
+            },
+            "bins": { "type": "integer", "minimum": 1 },
+            "record": { "$ref": "#/$defs/record" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "type", "source", "q"],
+          "properties": {
+            "id": { "$ref": "#/$defs/id" },
+            "type": { "const": "percentile" },
+            "source": {
+              "type": "string",
+              "pattern": "^agent\\.[A-Za-z_][A-Za-z0-9_]*$"
+            },
+            "q": { "type": "number", "minimum": 0, "maximum": 1 },
+            "record": { "$ref": "#/$defs/record" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "type", "x", "y"],
+          "properties": {
+            "id": { "$ref": "#/$defs/id" },
+            "type": { "const": "correlation" },
+            "x": {
+              "type": "string",
+              "pattern": "^agent\\.[A-Za-z_][A-Za-z0-9_]*$"
+            },
+            "y": {
+              "type": "string",
+              "pattern": "^agent\\.[A-Za-z_][A-Za-z0-9_]*$"
+            },
+            "record": { "$ref": "#/$defs/record" }
+          }
+        }
+      ]
+    }
+  }
+}

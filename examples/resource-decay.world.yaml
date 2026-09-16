@@ -1,0 +1,69 @@
+specVersion: "0.1"
+id: resource-decay
+title: Resource decay world
+description: A world-only deterministic/stochastic hybrid used to exercise global state and every-step observation.
+
+parameters:
+  decayFactor:
+    type: number
+    default: 0.97
+    min: 0
+    max: 1
+
+  replenishBelow:
+    type: number
+    default: 40
+    min: 0
+    max: 100
+
+  replenishChance:
+    type: number
+    default: 0.35
+    min: 0
+    max: 1
+
+  replenishAmount:
+    type: number
+    default: 25
+    min: 0
+    max: 100
+
+  capacity:
+    type: number
+    default: 100
+    min: 1
+    max: 1000000
+
+time:
+  steps: 100
+  label: tick
+
+world:
+  state:
+    resource:
+      type: number
+      mutable: true
+      init: 100
+
+events:
+  - id: decay
+    scope: world
+    effects:
+      - target: world.resource
+        op: multiply
+        value: "param.decayFactor"
+
+  - id: replenish
+    scope: world
+    condition: "world.resource < param.replenishBelow"
+    chance: "param.replenishChance"
+    effects:
+      - target: world.resource
+        op: set
+        value: "min(param.capacity, world.resource + param.replenishAmount)"
+
+observers:
+  - id: resource
+    type: value
+    source: world.resource
+    record: everyStep
