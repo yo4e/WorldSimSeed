@@ -1,0 +1,105 @@
+specVersion: "0.1"
+id: threshold-recovery
+title: Threshold recovery world
+description: Agents recover or relapse according to state-dependent conditions and resilience.
+
+parameters:
+  targetStress:
+    type: number
+    default: 0.30
+    min: 0
+    max: 1
+
+  recoveryBase:
+    type: number
+    default: 0.10
+    min: 0
+    max: 1
+
+  recoveryBoost:
+    type: number
+    default: 0.50
+    min: 0
+    max: 1
+
+  recoveryAmount:
+    type: number
+    default: 0.08
+    min: 0
+    max: 1
+
+  relapseChance:
+    type: number
+    default: 0.04
+    min: 0
+    max: 1
+
+  relapseAmount:
+    type: number
+    default: 0.12
+    min: 0
+    max: 1
+
+time:
+  steps: 60
+  label: day
+
+agents:
+  count: 500
+  state:
+    resilience:
+      type: number
+      mutable: false
+      init:
+        distribution: uniform
+        min: 0
+        max: 1
+
+    stress:
+      type: number
+      mutable: true
+      init:
+        distribution: normal
+        mean: 0.65
+        sd: 0.15
+        clamp: [0, 1]
+
+events:
+  - id: recover
+    scope: agent
+    condition: "agent.stress > param.targetStress"
+    chance: "clamp(param.recoveryBase + agent.resilience * param.recoveryBoost, 0, 1)"
+    effects:
+      - target: agent.stress
+        op: set
+        value: "max(0, agent.stress - param.recoveryAmount)"
+
+  - id: relapse
+    scope: agent
+    condition: "agent.stress < 1"
+    chance: "param.relapseChance"
+    effects:
+      - target: agent.stress
+        op: set
+        value: "min(1, agent.stress + param.relapseAmount)"
+
+observers:
+  - id: mean_stress
+    type: mean
+    source: agent.stress
+    record: everyStep
+
+  - id: p90_stress
+    type: percentile
+    source: agent.stress
+    q: 0.90
+
+  - id: high_stress_count
+    type: count
+    scope: agent
+    condition: "agent.stress >= 0.8"
+
+  - id: resilience_stress_correlation
+    type: correlation
+    x: agent.resilience
+    y: agent.stress
