@@ -212,7 +212,8 @@ export function validateExperimentRequest(value: unknown): ExperimentRequest {
   let parameters: Record<string, ExperimentParameterValue> | undefined;
   if (value.parameters !== undefined) {
     assertObject(value.parameters, "parameters");
-    parameters = Object.create(null);
+    const parsedParameters: Record<string, ExperimentParameterValue> =
+      Object.create(null);
     for (const [name, raw] of Object.entries(value.parameters)) {
       if (Array.isArray(raw)) {
         if (raw.length === 0 || raw.some((item) => !isScalar(item))) {
@@ -220,15 +221,16 @@ export function validateExperimentRequest(value: unknown): ExperimentRequest {
             `parameters.${name} must be a non-empty scalar array or scalar.`,
           );
         }
-        parameters[name] = [...raw] as Scalar[];
+        parsedParameters[name] = [...raw] as Scalar[];
       } else if (isScalar(raw)) {
-        parameters[name] = raw;
+        parsedParameters[name] = raw;
       } else {
         experimentSchemaError(
           `parameters.${name} must be a scalar or scalar array.`,
         );
       }
     }
+    parameters = parsedParameters;
   }
 
   assertObject(value.runs, "runs");
