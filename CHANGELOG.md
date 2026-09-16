@@ -8,6 +8,9 @@ The project follows Semantic Versioning for releases. During the `0.x` period, m
 
 ### Added
 
+- Batch experiment runner and CLI command with parameter-matrix expansion, deterministic seed sequences, selected-seed traces, numeric observer aggregates, event counts, and a 6-run CI smoke experiment.
+- Talent/Luck reference-model validation notes and P10/P90 wealth observers.
+
 - First TypeScript vertical slice: restricted YAML parsing, structural/semantic validation, safe expression evaluation, deterministic seeded simulation core, observers, run manifest, headless CLI, tests, and pull-request CI.
 
 - Initial OSS-readiness documentation covering security, contribution policy, release readiness, and the untrusted-world-spec boundary.
