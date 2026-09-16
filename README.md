@@ -153,6 +153,18 @@ WorldSimSeedは単独の教育・実験ツールとして成立させつつ、�
 - **Browser-friendly.** 可能ならサーバー不要でGitHub Pages等でも動かせる
 - **Not a universal solver.** 数学全般を解く巨大ツールにはしない
 
+## Batch experiments
+
+v0.1 experiment requests can expand parameter alternatives × seed sets into reproducible batch runs.
+
+```bash
+npm run demo:batch
+```
+
+The batch runner keeps a resolved manifest and metrics per run, reports aggregate count/mean/min/max for numeric observers, enforces `maxRuns`, and can retain trace only for selected seeds.
+
+See [run manifest / experiment request draft](docs/run-manifest-v0.1.md) and the [reference-model validation notes](docs/reference-model-v0.1.md).
+
 ## First reference experiment
 
 最初の動作確認用モデル候補は、2018年の研究 *Talent versus luck: the role of randomness in success and failure* に着想を得た「才能・運・富」の簡易モデル。

@@ -1,0 +1,22 @@
+experimentVersion: "0.1"
+world: ./talent-luck.world.yaml
+
+parameters:
+  opportunityRate: [0.08, 0.12]
+  misfortuneRate: 0.10
+
+runs:
+  seeds:
+    base: 42
+    count: 3
+
+trace:
+  mode: selected
+  seeds: [42]
+
+limits:
+  maxAgents: 5000
+  maxSteps: 500
+  maxRuns: 10
+  maxEvents: 1000000
+  maxTraceRecords: 100000

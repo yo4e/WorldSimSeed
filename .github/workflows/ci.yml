@@ -29,3 +29,6 @@ jobs:
 
       - name: Reference demo
         run: npm run demo
+
+      - name: Reference batch smoke
+        run: npm run demo:batch

@@ -148,7 +148,7 @@ const ID_PATTERN = /^[A-Za-z_][A-Za-z0-9_-]*$/;
 const NAME_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
 const DANGEROUS_NAMES = new Set(["__proto__", "prototype", "constructor"]);
 
-export function parseWorld(
+export function parseData(
   source: string,
   options: { format: "yaml" | "json" },
 ): unknown {
@@ -157,10 +157,17 @@ export function parseWorld(
   try {
     return JSON.parse(source);
   } catch (error) {
-    throw new WorldSimError("PARSE_ERROR", "Invalid JSON world spec.", {
+    throw new WorldSimError("PARSE_ERROR", "Invalid JSON input.", {
       cause: error instanceof Error ? error.message : String(error),
     });
   }
+}
+
+export function parseWorld(
+  source: string,
+  options: { format: "yaml" | "json" },
+): unknown {
+  return parseData(source, options);
 }
 
 export function validateWorld(
