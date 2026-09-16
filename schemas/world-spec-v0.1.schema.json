@@ -204,7 +204,7 @@
       "properties": {
         "target": {
           "type": "string",
-          "pattern": "^(agent|world)\.[A-Za-z_][A-Za-z0-9_]*$"
+          "pattern": "^(agent|world)\\.[A-Za-z_][A-Za-z0-9_]*$"
         },
         "op": { "enum": ["set", "add", "multiply"] },
         "value": { "$ref": "#/$defs/exprOrScalar" }
@@ -222,7 +222,7 @@
         "type": { "enum": ["value", "mean", "min", "max", "gini"] },
         "source": {
           "type": "string",
-          "pattern": "^(agent|world)\.[A-Za-z_][A-Za-z0-9_]*$"
+          "pattern": "^(agent|world)\\.[A-Za-z_][A-Za-z0-9_]*$"
         },
         "record": { "$ref": "#/$defs/record" }
       }
@@ -251,7 +251,7 @@
             "type": { "const": "histogram" },
             "source": {
               "type": "string",
-              "pattern": "^agent\.[A-Za-z_][A-Za-z0-9_]*$"
+              "pattern": "^agent\\.[A-Za-z_][A-Za-z0-9_]*$"
             },
             "bins": { "type": "integer", "minimum": 1 },
             "record": { "$ref": "#/$defs/record" }
@@ -266,7 +266,7 @@
             "type": { "const": "percentile" },
             "source": {
               "type": "string",
-              "pattern": "^agent\.[A-Za-z_][A-Za-z0-9_]*$"
+              "pattern": "^agent\\.[A-Za-z_][A-Za-z0-9_]*$"
             },
             "q": { "type": "number", "minimum": 0, "maximum": 1 },
             "record": { "$ref": "#/$defs/record" }
@@ -281,11 +281,11 @@
             "type": { "const": "correlation" },
             "x": {
               "type": "string",
-              "pattern": "^agent\.[A-Za-z_][A-Za-z0-9_]*$"
+              "pattern": "^agent\\.[A-Za-z_][A-Za-z0-9_]*$"
             },
             "y": {
               "type": "string",
-              "pattern": "^agent\.[A-Za-z_][A-Za-z0-9_]*$"
+              "pattern": "^agent\\.[A-Za-z_][A-Za-z0-9_]*$"
             },
             "record": { "$ref": "#/$defs/record" }
           }
