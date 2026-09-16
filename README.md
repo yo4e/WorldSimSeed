@@ -54,33 +54,17 @@ v0.1では、次の5要素に絞る想定です。
 4. **Rules** — 状態を変化させる規則
 5. **Observers** — 分布・平均・相関・Giniなどの観測
 
-世界定義は JSON / YAML 等の、人間とAIの双方が扱いやすい形式を候補とします。
+Issue #2 のv0.1設計draftでは、**YAMLを人間向けの主なauthoring format、JSON互換データモデルをcanonical model** とします。構造はJSON Schema + semantic validatorで検証し、式はallowlist型の小さなexpression languageだけを許可します。
 
-```yaml
-population: 1000
-steps: 80
+乱数は式の中の `random()` ではなく、初期値のdistributionとeventの `chance` に閉じ込めます。これにより、AIが生成したspecも通常のデータとして事前検証でき、seed固定の再現性を扱いやすくします。
 
-agents:
-  talent: normal(mean=0.6, sd=0.1)
-  wealth: 10
-
-events:
-  - name: luck
-    probability: 0.10
-    condition: random() < talent
-    effect: wealth *= 2
-
-  - name: misfortune
-    probability: 0.10
-    effect: wealth *= 0.5
-
-observe:
-  - wealth_distribution
-  - gini
-  - correlation(talent, wealth)
-```
-
-※これは仕様ではなく、構想を共有するための擬似記法です。
+- [world spec v0.1 draft](docs/world-spec-v0.1.md)
+- [run manifest v0.1 draft](docs/run-manifest-v0.1.md)
+- [JSON Schema draft](schemas/world-spec-v0.1.schema.json)
+- [validation test vectors](docs/world-spec-v0.1-test-vectors.md)
+- [Talent vs Luck sample](examples/talent-luck.world.yaml)
+- [Threshold recovery sample](examples/threshold-recovery.world.yaml)
+- [Resource decay sample](examples/resource-decay.world.yaml)
 
 ## Architecture direction
 
@@ -183,7 +167,7 @@ Resource-limit **categories** are part of the v0.1 contract, but numeric default
 
 ## License
 
-WorldSimSeed is proposed to be released under the [MIT License](LICENSE). The license becomes the project policy when the maintainer merges the OSS-readiness change.
+WorldSimSeed is released under the [MIT License](LICENSE).
 
 ## Research
 
@@ -191,9 +175,9 @@ WorldSimSeed is proposed to be released under the [MIT License](LICENSE). The li
 
 ## Next starting point
 
-**次回は [Issue #2: Design: v0.1 world spec / DSL を定義する](https://github.com/yo4e/WorldSimSeed/issues/2) から開始する。**
+**Issue #2 の設計draftをレビューし、確定後は [Issue #3: core / embed / visualization の境界](https://github.com/yo4e/WorldSimSeed/issues/3) へ進む。**
 
-調査の暫定判断は、既存の汎用ABMを再実装・直接wrapするのではなく、AI可読なworld spec、seed固定の再現実行、observerとtrace、Web標準での埋め込みに限定して独自実装することである。Issue #2では、この判断を検証する最小world specとrun manifestを定義する。
+Issue #2では、AI可読なworld spec、seed固定の再現実行、observer、run manifest、安全なexpression境界を具体的な文書・schema・sample worldへ落とし込んでいる。
 
 ---
 
