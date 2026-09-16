@@ -68,6 +68,16 @@ observers:
     x: agent.talent
     y: agent.wealth
 
+  - id: wealth_p10
+    type: percentile
+    source: agent.wealth
+    q: 0.10
+
+  - id: wealth_p90
+    type: percentile
+    source: agent.wealth
+    q: 0.90
+
   - id: wealth_histogram
     type: histogram
     source: agent.wealth
