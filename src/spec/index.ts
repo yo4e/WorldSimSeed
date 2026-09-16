@@ -874,3 +874,4 @@ function resourceError(
 
 export { canonicalJson, sha256Hex } from "./hash.js";
 export { parseExpression, evaluateExpression } from "./expression.js";
+export type { Scalar } from "./expression.js";
