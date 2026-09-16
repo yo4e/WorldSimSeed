@@ -12,9 +12,9 @@ WorldSimSeed は、**確率・エージェント・時間・イベント・観�
 
 ## Status
 
-**Concept / research phase. No implementation yet.**
+**Early implementation / v0.1 vertical slice.**
 
-まず類似OSS・製品・研究用ツールを調査し、WorldSimSeedを作る意味と最小仕様を固めてから実装します。
+v0.1のworld spec / security / architecture設計を土台に、最初のheadless実行系を実装中です。現在のvertical sliceは、制限付きYAML world specを読み、validation、seed付き実行、observer集計、run manifest出力までをNode/headlessで一通り通します。
 
 ## Core idea
 
@@ -65,6 +65,37 @@ Issue #2 のv0.1設計draftでは、**YAMLを人間向けの主なauthoring form
 - [Talent vs Luck sample](examples/talent-luck.world.yaml)
 - [Threshold recovery sample](examples/threshold-recovery.world.yaml)
 - [Resource decay sample](examples/resource-decay.world.yaml)
+
+## Current vertical slice
+
+実装済みの最小経路：
+
+```text
+world YAML
+  → restricted YAML parser
+  → structural / semantic validation
+  → safe expression compile
+  → deterministic seeded simulation
+  → observers
+  → run manifest
+  → Node/headless CLI
+```
+
+開発中のCLI例：
+
+```bash
+npm install
+npm run build
+node dist/src/cli.js run examples/talent-luck.world.yaml --seed 42
+```
+
+または：
+
+```bash
+npm run demo
+```
+
+v0.1 world spec自体には、任意JavaScript、network/filesystem、import/include、host object accessはありません。YAML parserも一般的なYAML全体ではなく、設計文書で定義したJSON互換subsetだけを受理します。
 
 ## Architecture direction
 

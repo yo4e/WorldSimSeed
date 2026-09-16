@@ -25,9 +25,14 @@ YAML is the primary human-facing authoring format.
 
 JSON containing the same data model is also valid input.
 
-YAML input is restricted to the JSON-compatible subset of YAML 1.2:
+YAML input is restricted to a small JSON-compatible subset of YAML 1.2:
 
-- mappings, sequences, strings, numbers, booleans, and null,
+- block mappings and block sequences,
+- flow-style sequences such as `[0, 1]`,
+- strings, numbers, booleans, and null,
+- indentation in multiples of two spaces,
+- no flow-style mappings (`{ key: value }`) in the v0.1 parser,
+- no multiline scalar syntax,
 - no custom tags,
 - no anchors or aliases,
 - no merge keys,
