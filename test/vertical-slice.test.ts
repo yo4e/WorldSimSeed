@@ -121,6 +121,23 @@ test("same spec and seed produce identical reference-world results", async () =>
   assert.equal(a.manifest.world.specHash, b.manifest.world.specHash);
 });
 
+test("threshold recovery sample parses and runs", async () => {
+  const source = await readFile("examples/threshold-recovery.world.yaml", "utf8");
+  const compiled = compileWorld(
+    validateWorld(parseWorld(source, { format: "yaml" }), { limits: LIMITS }),
+  );
+
+  const result = runWorld(compiled, {
+    seed: 99,
+    steps: 5,
+    limits: LIMITS,
+  });
+
+  assert.equal(result.finalState.t, 5);
+  assert.equal(result.history.mean_stress?.length, 6);
+  assert.equal(typeof result.metrics.values.high_stress_count, "number");
+});
+
 test("world-only sample records every-step history", async () => {
   const source = await readFile("examples/resource-decay.world.yaml", "utf8");
   const compiled = compileWorld(
