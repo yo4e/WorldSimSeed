@@ -9,7 +9,9 @@ The project follows Semantic Versioning for releases. During the `0.x` period, m
 ### Added
 
 - Initial OSS-readiness documentation covering security, contribution policy, release readiness, and the untrusted-world-spec boundary.
-- Draft MIT License for maintainer approval.
+- MIT License.
+
+- v0.1 world spec design draft, run-manifest contract, JSON Schema draft, validation test vectors, and three sample worlds.
 
 ### Changed
 
