@@ -20,5 +20,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "npm run build && node --test dist/test/*.test.js",
     "demo": "npm run build && node dist/src/cli.js run examples/talent-luck.world.yaml --seed 42"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
   }
 }
