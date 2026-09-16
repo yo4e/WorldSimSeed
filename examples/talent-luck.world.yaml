@@ -1,0 +1,74 @@
+specVersion: "0.1"
+id: talent-luck
+title: Talent and luck reference world
+description: Simplified reference model for exercising stochastic events and inequality observers.
+
+parameters:
+  opportunityRate:
+    type: number
+    default: 0.10
+    min: 0
+    max: 1
+
+  misfortuneRate:
+    type: number
+    default: 0.10
+    min: 0
+    max: 1
+
+time:
+  steps: 80
+  label: half-year
+
+agents:
+  count: 1000
+  state:
+    talent:
+      type: number
+      mutable: false
+      init:
+        distribution: normal
+        mean: 0.6
+        sd: 0.1
+        clamp: [0, 1]
+
+    wealth:
+      type: number
+      mutable: true
+      init: 10
+
+events:
+  - id: lucky_opportunity
+    scope: agent
+    chance: "param.opportunityRate * agent.talent"
+    effects:
+      - target: agent.wealth
+        op: multiply
+        value: 2
+
+  - id: misfortune
+    scope: agent
+    chance: "param.misfortuneRate"
+    effects:
+      - target: agent.wealth
+        op: multiply
+        value: 0.5
+
+observers:
+  - id: mean_wealth
+    type: mean
+    source: agent.wealth
+
+  - id: wealth_gini
+    type: gini
+    source: agent.wealth
+
+  - id: talent_wealth_correlation
+    type: correlation
+    x: agent.talent
+    y: agent.wealth
+
+  - id: wealth_histogram
+    type: histogram
+    source: agent.wealth
+    bins: 20
