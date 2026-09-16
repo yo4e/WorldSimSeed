@@ -165,6 +165,26 @@ WorldSimSeedは単独の教育・実験ツールとして成立させつつ、�
 - OSSライセンス、README、CONTRIBUTING、SECURITY等の公開準備
 - パフォーマンス上限と安全な式評価方式
 
+## Safety and OSS readiness
+
+WorldSimSeed is being designed on the assumption that an external world spec is **untrusted input**.
+
+For v0.1, a world spec is data rather than executable host code. Arbitrary JavaScript, spec-driven network/filesystem access, imports/includes, unbounded loops/recursion, and host-object access are outside the v0.1 boundary. Expression evaluation must use an explicit allowlist, and execution must remain subject to finite host-controlled resource limits.
+
+Current project-readiness documents:
+
+- [Security policy](SECURITY.md)
+- [v0.1 threat model and resource-limit policy](docs/security-model.md)
+- [v0.1 release checklist](docs/v0.1-release-checklist.md)
+- [Contributing](CONTRIBUTING.md)
+- [Changelog](CHANGELOG.md)
+
+Resource-limit **categories** are part of the v0.1 contract, but numeric defaults will be selected after representative browser/Node benchmarks rather than frozen from early estimates.
+
+## License
+
+WorldSimSeed is proposed to be released under the [MIT License](LICENSE). The license becomes the project policy when the maintainer merges the OSS-readiness change.
+
 ## Research
 
 - [類似OSS・製品・研究環境の調査と暫定判断（2026-08-22）](docs/research/2026-08-22-simulation-landscape.md)
