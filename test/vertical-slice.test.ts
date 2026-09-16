@@ -5,12 +5,17 @@ import test from "node:test";
 import { WorldSimError } from "../src/errors.js";
 import {
   compileWorld,
+  parseData,
   parseExpression,
   parseWorld,
   sha256Hex,
   validateWorld,
 } from "../src/spec/index.js";
-import { runWorld } from "../src/runner/index.js";
+import {
+  runExperiment,
+  runWorld,
+  validateExperimentRequest,
+} from "../src/runner/index.js";
 
 const LIMITS = {
   maxAgents: 5000,
@@ -154,6 +159,78 @@ test("world-only sample records every-step history", async () => {
   assert.equal(result.history.resource?.length, 11);
   assert.equal(result.history.resource?.[0]?.t, 0);
   assert.equal(result.history.resource?.[10]?.t, 10);
+});
+
+test("batch experiment expands parameter matrix and seed sequence", async () => {
+  const worldSource = await readFile("examples/talent-luck.world.yaml", "utf8");
+  const compiled = compileWorld(
+    validateWorld(parseWorld(worldSource, { format: "yaml" }), { limits: LIMITS }),
+  );
+  const experimentSource = await readFile(
+    "examples/talent-luck.smoke.experiment.yaml",
+    "utf8",
+  );
+  const request = validateExperimentRequest(
+    parseData(experimentSource, { format: "yaml" }),
+  );
+
+  const result = runExperiment(compiled, request, LIMITS);
+
+  assert.equal(result.runCount, 6);
+  assert.equal(result.runs.length, 6);
+  assert.equal(result.aggregates.mean_wealth?.count, 6);
+  assert.equal(result.aggregates.wealth_gini?.count, 6);
+  assert.equal(result.eventCount.count, 6);
+
+  const tracedRuns = result.runs.filter((run) => run.trace !== undefined);
+  assert.equal(tracedRuns.length, 2);
+  assert.deepEqual(
+    [...new Set(tracedRuns.map((run) => run.manifest.seed))],
+    [42],
+  );
+
+  const parameterPairs = result.runs.map((run) => [
+    run.manifest.parameters.opportunityRate,
+    run.manifest.seed,
+  ]);
+  assert.deepEqual(parameterPairs, [
+    [0.08, 42],
+    [0.08, 43],
+    [0.08, 44],
+    [0.12, 42],
+    [0.12, 43],
+    [0.12, 44],
+  ]);
+});
+
+test("batch experiment enforces maxRuns before execution", async () => {
+  const worldSource = await readFile("examples/talent-luck.world.yaml", "utf8");
+  const compiled = compileWorld(
+    validateWorld(parseWorld(worldSource, { format: "yaml" }), { limits: LIMITS }),
+  );
+  const request = validateExperimentRequest(
+    parseData(
+      `
+experimentVersion: "0.1"
+world: ./talent-luck.world.yaml
+parameters:
+  opportunityRate: [0.08, 0.12]
+runs:
+  seeds:
+    base: 1
+    count: 3
+limits:
+  maxRuns: 5
+`,
+      { format: "yaml" },
+    ),
+  );
+
+  assert.throws(
+    () => runExperiment(compiled, request, LIMITS),
+    (error) =>
+      error instanceof WorldSimError && error.code === "RESOURCE_LIMIT",
+  );
 });
 
 test("preflight resource limits reject oversized worlds", () => {
