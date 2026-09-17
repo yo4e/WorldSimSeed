@@ -12,17 +12,20 @@
     ".": "./dist/src/index.js",
     "./spec": "./dist/src/spec/index.js",
     "./core": "./dist/src/core/index.js",
-    "./runner": "./dist/src/runner/index.js"
+    "./runner": "./dist/src/runner/index.js",
+    "./web": "./dist/src/web/index.js"
   },
   "types": "./dist/src/index.d.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "npm run build && node --test dist/test/*.test.js",
+    "test:browser": "npm run build && playwright test",
     "demo": "npm run build && node dist/src/cli.js run examples/talent-luck.world.yaml --seed 42",
     "demo:batch": "npm run build && node dist/src/cli.js experiment examples/talent-luck.smoke.experiment.yaml"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "typescript": "^5.8.3"
   }
 }
