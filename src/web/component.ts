@@ -122,6 +122,9 @@ export class WorldSimElement extends HTMLElement {
     format?: WorldSourceFormat,
   ): Promise<WebSimulationView> {
     return this.perform(async () => {
+      this.loaded = false;
+      this.updateControls();
+
       const source = await this.resolveSource(input, format);
       const view = await this.ensureClient().load({
         source: source.source,
@@ -142,16 +145,19 @@ export class WorldSimElement extends HTMLElement {
   async reset(options: WorldSimResetOptions = {}): Promise<WebSimulationView> {
     return this.perform(async () => {
       if (!this.loaded) return this.load();
+
+      const seed = options.seed ?? this.seed;
+      const parameters = options.parameters ?? this.parameters;
+      const steps = options.steps ?? this.steps;
+      const limits = options.limits ?? this.limits;
+      const trace = options.trace ?? this.trace;
+
       const view = await this.ensureClient().reset({
-        ...(options.seed === undefined ? {} : { seed: options.seed }),
-        ...(options.parameters === undefined
-          ? {}
-          : { parameters: { ...options.parameters } }),
-        ...(options.steps === undefined ? {} : { steps: options.steps }),
-        ...(options.limits === undefined
-          ? {}
-          : { limits: { ...options.limits } }),
-        ...(options.trace === undefined ? {} : { trace: options.trace }),
+        seed,
+        ...(parameters ? { parameters: { ...parameters } } : {}),
+        ...(steps === undefined ? {} : { steps }),
+        limits: { ...limits },
+        trace,
       });
       this.updateView(view);
       this.emit("worldsim-ready", view);
@@ -192,14 +198,13 @@ export class WorldSimElement extends HTMLElement {
   }
 
   async cancel(): Promise<{ cancelled: boolean }> {
-    return this.perform(async () => {
-      const result = await this.ensureClient().cancel();
-      return result;
-    });
+    return this.perform(async () => this.ensureClient().cancel());
   }
 
   async getState() {
-    return this.perform(async () => this.ensureLoaded().then((client) => client.getState()));
+    return this.perform(async () =>
+      this.ensureLoaded().then((client) => client.getState()),
+    );
   }
 
   async getMetrics() {
