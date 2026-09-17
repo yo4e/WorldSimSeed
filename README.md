@@ -12,9 +12,9 @@ WorldSimSeed は、**確率・エージェント・時間・イベント・観�
 
 ## Status
 
-**Early implementation / v0.1 vertical slice.**
+**Early implementation / v0.1.**
 
-v0.1のworld spec / security / architecture設計を土台に、最初のheadless実行系を実装中です。現在のvertical sliceは、制限付きYAML world specを読み、validation、seed付き実行、observer集計、run manifest出力までをNode/headlessで一通り通します。
+v0.1のworld spec / security / architecture設計を土台に、Node/headlessのvertical sliceは成立済みです。現在は同じ `spec` / `core` semantics をbrowser Workerへ持ち込み、最小Web Component `<world-sim>` から実行できるところまで進んでいます。
 
 ## Core idea
 
@@ -54,7 +54,7 @@ v0.1では、次の5要素に絞る想定です。
 4. **Rules** — 状態を変化させる規則
 5. **Observers** — 分布・平均・相関・Giniなどの観測
 
-Issue #2 のv0.1設計draftでは、**YAMLを人間向けの主なauthoring format、JSON互換データモデルをcanonical model** とします。構造はJSON Schema + semantic validatorで検証し、式はallowlist型の小さなexpression languageだけを許可します。
+v0.1設計では、**YAMLを人間向けの主なauthoring format、JSON互換データモデルをcanonical model** とします。構造はstructural + semantic validationで検証し、式はallowlist型の小さなexpression languageだけを許可します。
 
 乱数は式の中の `random()` ではなく、初期値のdistributionとeventの `chance` に閉じ込めます。これにより、AIが生成したspecも通常のデータとして事前検証でき、seed固定の再現性を扱いやすくします。
 
@@ -68,7 +68,7 @@ Issue #2 のv0.1設計draftでは、**YAMLを人間向けの主なauthoring form
 
 ## Current vertical slice
 
-実装済みの最小経路：
+Node/headlessの最小経路：
 
 ```text
 world YAML
@@ -81,7 +81,18 @@ world YAML
   → Node/headless CLI
 ```
 
-開発中のCLI例：
+ブラウザ側は同じportable layerを使い、その外側にWorkerとWeb Componentを置きます：
+
+```text
+<world-sim>
+  → host-owned src fetch / inline world
+  → module Worker
+  → same spec / core semantics
+  → snapshots / metrics / run manifest
+  → DOM Custom Events
+```
+
+CLI例：
 
 ```bash
 npm install
@@ -97,32 +108,50 @@ npm run demo
 
 v0.1 world spec自体には、任意JavaScript、network/filesystem、import/include、host object accessはありません。YAML parserも一般的なYAML全体ではなく、設計文書で定義したJSON互換subsetだけを受理します。
 
+## Web embedding
+
+ビルド済みのweb entryを読み込むと、`<world-sim>` を埋め込めます。
+
+```html
+<script type="module" src="/dist/src/web/index.js"></script>
+
+<world-sim
+  src="/examples/talent-luck.world.yaml"
+  seed="42">
+</world-sim>
+```
+
+最小demoは [`examples/web/index.html`](examples/web/index.html)、詳しい境界とAPIは [Web embedding v0.1](docs/web-embedding-v0.1.md) を参照してください。
+
+`src` のfetchは埋め込みhost側の権限で行い、world spec自身にはnetwork権限を与えません。長い `run()` はWorker内でchunk実行し、main threadを占有せず、chunk間でcancelを受け取れるようにします。
+
+Web Componentの主な操作：
+
+```js
+await element.load();
+await element.step();
+await element.run();
+await element.reset({ seed: 42 });
+await element.getState();
+await element.getMetrics();
+await element.exportRun();
+```
+
+v0.1ではrun途中のparameter変更は行わず、変更はreset/new runとして扱います。
+
 ## Architecture direction
 
 WorldSimSeed は「アプリ」だけではなく、**埋め込み可能な部品**として使える構成を目指します。
 
-想定レイヤー：
+v0.1では1つのpackage内に、次の論理境界を置きます。
 
-- `sim-core` — UIを持たないシミュレーションエンジン
-- `world-spec` — 世界定義フォーマットとvalidator
-- `sim-view` — グラフ・エージェント・ネットワーク等の可視化
-- `web-component` — 他サイトへ埋め込めるWeb Component
-- `headless` — UIなしで大量試行し統計を返す実行モード
+- `worldsimseed/spec` — world spec parser / validator / compiler
+- `worldsimseed/core` — UI/I/Oを持たないsimulation core
+- `worldsimseed/runner` — single / batch run orchestration
+- `worldsimseed/web` — Worker / Web Component browser adapter
+- `view` — visualization境界。豪華な可視化はcore安定後に追加
 
-将来的には、たとえば次のような埋め込みを想定します。
-
-```html
-<world-sim src="/worlds/example.yaml"></world-sim>
-```
-
-外部アプリからは、概念的には次のように操作できる形を検討します。
-
-```js
-sim.step();
-sim.run(1000);
-sim.getState();
-sim.setParameter("scarcity", 0.8);
-```
+詳しくは [architecture v0.1](docs/architecture-v0.1.md) を参照してください。
 
 ## NOZOMI Beingsとの接続可能性
 
@@ -167,9 +196,9 @@ See [run manifest / experiment request draft](docs/run-manifest-v0.1.md) and the
 
 ## First reference experiment
 
-最初の動作確認用モデル候補は、2018年の研究 *Talent versus luck: the role of randomness in success and failure* に着想を得た「才能・運・富」の簡易モデル。
+最初の動作確認用モデルは、2018年の研究 *Talent versus luck: the role of randomness in success and failure* に着想を得た「才能・運・富」の簡易モデルです。
 
-これはWorldSimSeedの目的そのものではなく、次の機能を一度に検証できるためのreference modelとして使う想定です。
+これはWorldSimSeedの目的そのものではなく、次の機能を一度に検証できるreference modelとして使います。
 
 - 正規分布
 - 確率イベント
@@ -180,9 +209,9 @@ See [run manifest / experiment request draft](docs/run-manifest-v0.1.md) and the
 - 分布・相関・Gini等の集計
 - seed固定による再現
 
-## Before coding
+## Design foundation
 
-実装開始前に、GitHub Issuesで以下を整理します。
+実装前に、GitHub Issuesで以下を整理しました。
 
 - 類似OSS・商用製品・研究ツールの調査
 - WorldSimSeedの差別化と「作る意味」の確認
@@ -194,9 +223,9 @@ See [run manifest / experiment request draft](docs/run-manifest-v0.1.md) and the
 
 ## Safety and OSS readiness
 
-WorldSimSeed is being designed on the assumption that an external world spec is **untrusted input**.
+WorldSimSeed is designed on the assumption that an external world spec is **untrusted input**.
 
-For v0.1, a world spec is data rather than executable host code. Arbitrary JavaScript, spec-driven network/filesystem access, imports/includes, unbounded loops/recursion, and host-object access are outside the v0.1 boundary. Expression evaluation must use an explicit allowlist, and execution must remain subject to finite host-controlled resource limits.
+For v0.1, a world spec is data rather than executable host code. Arbitrary JavaScript, spec-driven network/filesystem access, imports/includes, unbounded loops/recursion, and host-object access are outside the v0.1 boundary. Expression evaluation uses an explicit allowlist, and execution remains subject to finite host-controlled resource limits.
 
 Current project-readiness documents:
 
@@ -206,7 +235,7 @@ Current project-readiness documents:
 - [Contributing](CONTRIBUTING.md)
 - [Changelog](CHANGELOG.md)
 
-Resource-limit **categories** are part of the v0.1 contract, but numeric defaults will be selected after representative browser/Node benchmarks rather than frozen from early estimates.
+Resource-limit **categories** are part of the v0.1 contract, but final numeric release defaults will be selected after representative browser/Node benchmarks rather than frozen from early estimates.
 
 ## License
 
@@ -218,9 +247,7 @@ WorldSimSeed is released under the [MIT License](LICENSE).
 
 ## Next starting point
 
-**Issue #2 の設計draftをレビューし、確定後は [Issue #3: core / embed / visualization の境界](https://github.com/yo4e/WorldSimSeed/issues/3) へ進む。**
-
-Issue #2では、AI可読なworld spec、seed固定の再現実行、observer、run manifest、安全なexpression境界を具体的な文書・schema・sample worldへ落とし込んでいる。
+Current browser work is tracked in [Issue #14](https://github.com/yo4e/WorldSimSeed/issues/14). After the Worker/Web Component slice is accepted, the next phase is v0.1 hardening: resource benchmarks and defaults, schema-artifact/runtime drift checks, abort/limit review, public API/docs cleanup, and release-checklist reconciliation.
 
 ---
 
