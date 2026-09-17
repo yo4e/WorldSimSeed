@@ -12,7 +12,8 @@
     ".": "./dist/src/index.js",
     "./spec": "./dist/src/spec/index.js",
     "./core": "./dist/src/core/index.js",
-    "./runner": "./dist/src/runner/index.js"
+    "./runner": "./dist/src/runner/index.js",
+    "./web": "./dist/src/web/index.js"
   },
   "types": "./dist/src/index.d.ts",
   "scripts": {
