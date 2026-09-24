@@ -13,6 +13,33 @@ const LIMITS = {
   maxRuns: 1,
 };
 
+test("Pages demo shell loads the real worker runtime and replays seed 42", async ({ page }) => {
+  await page.goto("/index.html");
+
+  await expect(page.getByRole("heading", { name: "WorldSimSeed" })).toBeVisible();
+  const component = page.locator("world-sim");
+  const status = component.locator("[data-status]");
+  const runButton = component.locator('button[data-action="run"]');
+
+  await expect(status).toContainText("running · t=0");
+  await runButton.click();
+  await expect(status).toContainText("completed · t=80");
+  const firstMetrics = await component.locator("[data-metrics]").textContent();
+
+  await page.locator("#seed").fill("7");
+  await page.locator("#apply-seed").click();
+  await expect(status).toContainText("running · t=0");
+
+  await page.locator("#seed").fill("42");
+  await page.locator("#apply-seed").click();
+  await expect(status).toContainText("running · t=0");
+  await runButton.click();
+  await expect(status).toContainText("completed · t=80");
+  const replayMetrics = await component.locator("[data-metrics]").textContent();
+
+  expect(replayMetrics).toBe(firstMetrics);
+});
+
 test("world-sim Worker matches headless metrics for the same seed", async ({ page }) => {
   const source = await readFile("examples/talent-luck.world.yaml", "utf8");
   const compiled = compileWorld(
