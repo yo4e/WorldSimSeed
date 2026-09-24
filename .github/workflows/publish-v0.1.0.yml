@@ -15,8 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Check out release notes
+      - name: Check out release notes and tested commit
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Verify tested release commit
         shell: bash
@@ -36,5 +38,4 @@ jobs:
             --repo "$GITHUB_REPOSITORY" \
             --target 1660deacd688071a4febba7934ec9c51931914ad \
             --title "WorldSimSeed v0.1.0" \
-            --notes-file docs/releases/v0.1.0.md \
-            --verify-tag=false
+            --notes-file docs/releases/v0.1.0.md
