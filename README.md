@@ -125,6 +125,10 @@ v0.1 world spec自体には、任意JavaScript、network/filesystem、import/inc
 
 ## Web embedding
 
+**Live demo:** https://yo4e.github.io/WorldSimSeed/
+
+The GitHub Pages demo uses the real browser entry point, module Worker, and `examples/talent-luck.world.yaml`. It is intentionally small so the hosted demo doubles as a deployment check for the embeddable v0.1 browser path.
+
 ビルド済みのweb entryを読み込むと、`<world-sim>` を埋め込めます。
 
 ```html
@@ -136,7 +140,7 @@ v0.1 world spec自体には、任意JavaScript、network/filesystem、import/inc
 </world-sim>
 ```
 
-最小demoは [`examples/web/index.html`](examples/web/index.html)、詳しい境界とAPIは [Web embedding v0.1](docs/web-embedding-v0.1.md) を参照してください。
+最小demoは [`examples/web/index.html`](examples/web/index.html)、Pages用のshellは [`pages/index.html`](pages/index.html)、詳しい境界とAPIは [Web embedding v0.1](docs/web-embedding-v0.1.md) を参照してください。
 
 `src` のfetchは埋め込みhost側の権限で行い、`credentials: "omit"` を使います。world spec自身にはnetwork権限を与えません。長い `run()` はWorker内でchunk実行し、main threadを占有せず、chunk間でcancelを受け取れるようにします。
 
@@ -275,7 +279,7 @@ WorldSimSeed is released under the [MIT License](LICENSE).
 
 ## Next starting point
 
-Issue #16 / PR #17 hardens the v0.1 release candidate. After that PR is reviewed and merged, the remaining release mechanics are intentionally separate: finalize release notes/version metadata, retest the exact tag candidate, and only then decide whether to publish/tag/create a GitHub Release.
+Issue #18 publishes the real browser vertical slice as a GitHub Pages demo. After that deployment is verified, the remaining v0.1 release mechanics are intentionally separate: finalize release notes/version metadata, retest the exact tag candidate, and only then decide whether to publish/tag/create a GitHub Release.
 
 ---
 
