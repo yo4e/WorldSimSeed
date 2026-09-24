@@ -1,7 +1,7 @@
 import type { ResourceLimits } from "./spec/index.js";
 
 /**
- * Conservative host defaults for the v0.1 release candidate.
+ * Conservative host defaults for WorldSimSeed v0.1.
  *
  * Hosts may choose lower limits freely. Raising these values is an explicit
  * host decision and is never controlled by a world spec.
