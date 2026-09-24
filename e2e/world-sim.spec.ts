@@ -6,12 +6,10 @@ import {
   parseWorld,
   validateWorld,
 } from "../dist/src/spec/index.js";
+import { DEFAULT_RESOURCE_LIMITS } from "../dist/src/limits.js";
 
 const LIMITS = {
-  maxAgents: 5_000,
-  maxSteps: 5_000,
-  maxEvents: 2_000_000,
-  maxTraceRecords: 100_000,
+  ...DEFAULT_RESOURCE_LIMITS,
   maxRuns: 1,
 };
 
@@ -102,4 +100,64 @@ observers: []
     code: "EXPRESSION_ERROR",
   });
   expect(detail).not.toHaveProperty("stack");
+});
+
+test("worker run keeps the browser main thread responsive", async ({ page }) => {
+  await page.goto("/examples/web/index.html");
+
+  const result = await page.evaluate(async () => {
+    const element = document.createElement("world-sim") as HTMLElement & {
+      load(input: Record<string, unknown>): Promise<unknown>;
+      run(chunkSize?: number): Promise<{
+        status: string;
+        cancelled: boolean;
+        state: { t: number };
+      }>;
+    };
+    document.body.append(element);
+
+    await element.load({
+      specVersion: "0.1",
+      id: "browser-benchmark",
+      time: { steps: 200 },
+      agents: {
+        count: 2_000,
+        state: {
+          x: { type: "number", mutable: true, init: 0 },
+        },
+      },
+      events: [
+        {
+          id: "increment",
+          scope: "agent",
+          chance: 0.05,
+          effects: [{ target: "agent.x", op: "add", value: 1 }],
+        },
+      ],
+      observers: [{ id: "mean_x", type: "mean", source: "agent.x" }],
+    });
+
+    let mainThreadTicks = 0;
+    const timer = window.setInterval(() => {
+      mainThreadTicks += 1;
+    }, 0);
+    const started = performance.now();
+    const run = await element.run(8);
+    const durationMs = Math.round((performance.now() - started) * 10) / 10;
+    window.clearInterval(timer);
+
+    return {
+      durationMs,
+      mainThreadTicks,
+      status: run.status,
+      cancelled: run.cancelled,
+      t: run.state.t,
+    };
+  });
+
+  console.log(`WSS_BROWSER_BENCH ${JSON.stringify(result)}`);
+  expect(result.status).toBe("completed");
+  expect(result.cancelled).toBe(false);
+  expect(result.t).toBe(200);
+  expect(result.mainThreadTicks).toBeGreaterThan(0);
 });
