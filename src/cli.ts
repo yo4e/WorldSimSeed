@@ -2,6 +2,7 @@
 import { readFile } from "node:fs/promises";
 import { dirname, extname, resolve } from "node:path";
 import { WorldSimError } from "./errors.js";
+import { DEFAULT_RESOURCE_LIMITS } from "./limits.js";
 import {
   compileWorld,
   parseData,
@@ -14,13 +15,7 @@ import {
   validateExperimentRequest,
 } from "./runner/index.js";
 
-const CLI_LIMITS = Object.freeze({
-  maxAgents: 10_000,
-  maxSteps: 10_000,
-  maxEvents: 10_000_000,
-  maxTraceRecords: 100_000,
-  maxRuns: 1_000,
-});
+const CLI_LIMITS = DEFAULT_RESOURCE_LIMITS;
 
 async function main() {
   const [, , command, file, ...args] = process.argv;
@@ -128,8 +123,8 @@ function printUsage() {
       "  worldsimseed run <world.yaml|world.json> --seed <uint32> [--steps N] [--trace]",
       "  worldsimseed experiment <experiment.yaml|experiment.json>",
       "",
-      "The CLI limits in this development vertical slice are provisional adapter limits,",
-      "not the benchmark-derived v0.1 release defaults.",
+      "Runs are constrained by the conservative v0.1 host defaults documented in",
+      "docs/resource-benchmark-v0.1.md. World specs cannot raise those limits.",
     ].join("\n"),
   );
 }
