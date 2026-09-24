@@ -48,5 +48,7 @@ WorldSimSeed v0.1 deliberately keeps a narrow execution model. These limits are 
 ## Package and release
 
 - The repository version remains `0.1.0-dev.0` until the separate release operation.
+- `package.json` deliberately remains `private: true` during Issue #16. This preserves an npm publish guard while still allowing `npm pack`, tarball inspection, clean tarball install, exports/type checks, tests, and demos.
+- If npm publication is chosen later, changing `private` is an explicit release action performed only on the exact tested release candidate.
 - Issue #16 does not publish to npm, create a `v0.1.0` tag, or create a GitHub Release.
 - A committed npm lockfile is not currently part of the source policy. CI performs a fresh dependency resolution, production dependency audit, package dry run, and clean install of the generated tarball. A lockfile policy can be revisited if reproducible contributor-tooling resolution becomes a release requirement.
