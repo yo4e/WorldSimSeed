@@ -1,6 +1,6 @@
-# World spec v0.1 draft
+# World spec v0.1
 
-Status: design draft for Issue #2  
+Status: released contract for WorldSimSeed v0.1.0  
 Security boundary: [security-model.md](security-model.md)
 
 ## Purpose
@@ -559,7 +559,7 @@ These can be reconsidered only through later versioned spec changes.
 
 ## 13. Sample worlds
 
-The draft is stress-tested with three intentionally different examples:
+The v0.1 contract is exercised with three intentionally different examples:
 
 - [Talent vs Luck-style world](../examples/talent-luck.world.yaml)
 - [Threshold recovery world](../examples/threshold-recovery.world.yaml)
