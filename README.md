@@ -140,7 +140,7 @@ The GitHub Pages demo uses the real browser entry point, module Worker, and `exa
 </world-sim>
 ```
 
-最小demoは [`examples/web/index.html`](examples/web/index.html)、Pages用のshellは [`pages/index.html`](pages/index.html)、詳しい境界とAPIは [Web embedding v0.1](docs/web-embedding-v0.1.md) を参照してください。
+最小demoは [`examples/web/index.html`](examples/web/index.html)、Pagesでそのまま配るshellは [`index.html`](index.html)、詳しい境界とAPIは [Web embedding v0.1](docs/web-embedding-v0.1.md) を参照してください。
 
 `src` のfetchは埋め込みhost側の権限で行い、`credentials: "omit"` を使います。world spec自身にはnetwork権限を与えません。長い `run()` はWorker内でchunk実行し、main threadを占有せず、chunk間でcancelを受け取れるようにします。
 
