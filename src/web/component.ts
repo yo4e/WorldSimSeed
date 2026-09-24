@@ -1,3 +1,4 @@
+import { DEFAULT_RESOURCE_LIMITS } from "../limits.js";
 import type { ResourceLimits, Scalar } from "../spec/index.js";
 import {
   createBrowserWorkerClient,
@@ -12,10 +13,7 @@ import type {
 } from "./protocol.js";
 
 export const WEB_COMPONENT_LIMITS: ResourceLimits = Object.freeze({
-  maxAgents: 5_000,
-  maxSteps: 5_000,
-  maxEvents: 2_000_000,
-  maxTraceRecords: 100_000,
+  ...DEFAULT_RESOURCE_LIMITS,
   maxRuns: 1,
 });
 

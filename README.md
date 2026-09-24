@@ -12,9 +12,9 @@ WorldSimSeed は、**確率・エージェント・時間・イベント・観�
 
 ## Status
 
-**Early implementation / v0.1.**
+**v0.1 release candidate hardening.**
 
-v0.1のworld spec / security / architecture設計を土台に、Node/headlessのvertical sliceは成立済みです。現在は同じ `spec` / `core` semantics をbrowser Workerへ持ち込み、最小Web Component `<world-sim>` から実行できるところまで進んでいます。
+Node/headless、batch runner、browser Worker、最小Web Component `<world-sim>` のvertical sliceは成立済みです。現在はv0.1公開前のrelease gateとして、resource limits、schema/runtime parity、security negative tests、package surface、公開APIと既知制約を固定しています。npm publish / `v0.1.0` tag / GitHub Releaseは別の明示的なrelease操作として扱います。
 
 ## Core idea
 
@@ -42,11 +42,11 @@ v0.1のworld spec / security / architecture設計を土台に、Node/headlessの
 - 人口・資源・出生・死亡が変化する世界
 - 欲望を持つ人工住民が資源を奪い合う世界
 
-## Proposed minimal model for v0.1
+## Minimal model for v0.1
 
 最初から「あらゆる数学」を扱おうとはしません。
 
-v0.1では、次の5要素に絞る想定です。
+v0.1では、次の5要素に絞ります。
 
 1. **Agents** — 個体とその属性
 2. **Time** — tick / step / year などの時間進行
@@ -54,14 +54,17 @@ v0.1では、次の5要素に絞る想定です。
 4. **Rules** — 状態を変化させる規則
 5. **Observers** — 分布・平均・相関・Giniなどの観測
 
-v0.1設計では、**YAMLを人間向けの主なauthoring format、JSON互換データモデルをcanonical model** とします。構造はstructural + semantic validationで検証し、式はallowlist型の小さなexpression languageだけを許可します。
+v0.1では、**YAMLを人間向けの主なauthoring format、JSON互換データモデルをcanonical model** とします。構造はstructural + semantic validationで検証し、式はallowlist型の小さなexpression languageだけを許可します。
 
 乱数は式の中の `random()` ではなく、初期値のdistributionとeventの `chance` に閉じ込めます。これにより、AIが生成したspecも通常のデータとして事前検証でき、seed固定の再現性を扱いやすくします。
 
-- [world spec v0.1 draft](docs/world-spec-v0.1.md)
-- [run manifest v0.1 draft](docs/run-manifest-v0.1.md)
-- [JSON Schema draft](schemas/world-spec-v0.1.schema.json)
+- [world spec v0.1](docs/world-spec-v0.1.md)
+- [run manifest v0.1](docs/run-manifest-v0.1.md)
+- [JSON Schema artifact](schemas/world-spec-v0.1.schema.json)
 - [validation test vectors](docs/world-spec-v0.1-test-vectors.md)
+- [public API v0.1](docs/public-api-v0.1.md)
+- [known limitations v0.1](docs/known-limitations-v0.1.md)
+- [resource benchmark and defaults](docs/resource-benchmark-v0.1.md)
 - [Talent vs Luck sample](examples/talent-luck.world.yaml)
 - [Threshold recovery sample](examples/threshold-recovery.world.yaml)
 - [Resource decay sample](examples/resource-decay.world.yaml)
@@ -108,6 +111,18 @@ npm run demo
 
 v0.1 world spec自体には、任意JavaScript、network/filesystem、import/include、host object accessはありません。YAML parserも一般的なYAML全体ではなく、設計文書で定義したJSON互換subsetだけを受理します。
 
+## Five-minute path
+
+リポジトリをcloneした状態から、最小の実験は次の流れです。
+
+1. `npm install`
+2. `examples/talent-luck.world.yaml` を開き、`opportunityRate` の `default` を確認する
+3. `npm run demo` で seed 42 の基準runを実行する
+4. `opportunityRate` の `default` を別の値へ変更して、もう一度 `npm run demo` を実行する
+5. JSON出力の `metrics.values` と `manifest.parameters` を比較する
+
+元ファイルを編集したくない場合はコピーを作り、CLIへそのファイルを渡してください。batchの最小例は `npm run demo:batch` です。
+
 ## Web embedding
 
 ビルド済みのweb entryを読み込むと、`<world-sim>` を埋め込めます。
@@ -123,7 +138,7 @@ v0.1 world spec自体には、任意JavaScript、network/filesystem、import/inc
 
 最小demoは [`examples/web/index.html`](examples/web/index.html)、詳しい境界とAPIは [Web embedding v0.1](docs/web-embedding-v0.1.md) を参照してください。
 
-`src` のfetchは埋め込みhost側の権限で行い、world spec自身にはnetwork権限を与えません。長い `run()` はWorker内でchunk実行し、main threadを占有せず、chunk間でcancelを受け取れるようにします。
+`src` のfetchは埋め込みhost側の権限で行い、`credentials: "omit"` を使います。world spec自身にはnetwork権限を与えません。長い `run()` はWorker内でchunk実行し、main threadを占有せず、chunk間でcancelを受け取れるようにします。
 
 Web Componentの主な操作：
 
@@ -131,6 +146,7 @@ Web Componentの主な操作：
 await element.load();
 await element.step();
 await element.run();
+await element.cancel();
 await element.reset({ seed: 42 });
 await element.getState();
 await element.getMetrics();
@@ -141,17 +157,17 @@ v0.1ではrun途中のparameter変更は行わず、変更はreset/new runとし
 
 ## Architecture direction
 
-WorldSimSeed は「アプリ」だけではなく、**埋め込み可能な部品**として使える構成を目指します。
+WorldSimSeed は「アプリ」だけではなく、**埋め込み可能な部品**として使える構成です。
 
-v0.1では1つのpackage内に、次の論理境界を置きます。
+v0.1では1つのpackage内に、次の公開entry pointを置きます。
 
+- `worldsimseed` — errors / defaults / portable APIのroot
 - `worldsimseed/spec` — world spec parser / validator / compiler
 - `worldsimseed/core` — UI/I/Oを持たないsimulation core
 - `worldsimseed/runner` — single / batch run orchestration
 - `worldsimseed/web` — Worker / Web Component browser adapter
-- `view` — visualization境界。豪華な可視化はcore安定後に追加
 
-詳しくは [architecture v0.1](docs/architecture-v0.1.md) を参照してください。
+豪華なvisualization layerはv0.1 coreの外です。詳しくは [architecture v0.1](docs/architecture-v0.1.md) と [public API v0.1](docs/public-api-v0.1.md) を参照してください。
 
 ## NOZOMI Beingsとの接続可能性
 
@@ -190,9 +206,9 @@ v0.1 experiment requests can expand parameter alternatives × seed sets into rep
 npm run demo:batch
 ```
 
-The batch runner keeps a resolved manifest and metrics per run, reports aggregate count/mean/min/max for numeric observers, enforces `maxRuns`, and can retain trace only for selected seeds.
+The batch runner keeps a resolved manifest and metrics per run, reports aggregate count/mean/min/max for numeric observers, enforces `maxRuns` before execution, rejects unknown/out-of-range parameter requests, rejects derived seed overflow, and can retain trace only for selected seeds.
 
-See [run manifest / experiment request draft](docs/run-manifest-v0.1.md) and the [reference-model validation notes](docs/reference-model-v0.1.md).
+See [run manifest / experiment request v0.1](docs/run-manifest-v0.1.md) and the [reference-model validation notes](docs/reference-model-v0.1.md).
 
 ## First reference experiment
 
@@ -227,15 +243,27 @@ WorldSimSeed is designed on the assumption that an external world spec is **untr
 
 For v0.1, a world spec is data rather than executable host code. Arbitrary JavaScript, spec-driven network/filesystem access, imports/includes, unbounded loops/recursion, and host-object access are outside the v0.1 boundary. Expression evaluation uses an explicit allowlist, and execution remains subject to finite host-controlled resource limits.
 
+Release-candidate defaults are:
+
+```text
+maxAgents       5,000
+maxSteps          500
+maxRuns           100
+maxEvents   1,000,000
+maxTraceRecords 50,000
+```
+
+These are safety ceilings rather than performance promises. Benchmark evidence and rationale are in [resource benchmark and v0.1 defaults](docs/resource-benchmark-v0.1.md). Hosts may lower them; a world spec cannot raise them.
+
 Current project-readiness documents:
 
 - [Security policy](SECURITY.md)
 - [v0.1 threat model and resource-limit policy](docs/security-model.md)
+- [public API v0.1](docs/public-api-v0.1.md)
+- [known limitations v0.1](docs/known-limitations-v0.1.md)
 - [v0.1 release checklist](docs/v0.1-release-checklist.md)
 - [Contributing](CONTRIBUTING.md)
 - [Changelog](CHANGELOG.md)
-
-Resource-limit **categories** are part of the v0.1 contract, but final numeric release defaults will be selected after representative browser/Node benchmarks rather than frozen from early estimates.
 
 ## License
 
@@ -247,7 +275,7 @@ WorldSimSeed is released under the [MIT License](LICENSE).
 
 ## Next starting point
 
-Current browser work is tracked in [Issue #14](https://github.com/yo4e/WorldSimSeed/issues/14). After the Worker/Web Component slice is accepted, the next phase is v0.1 hardening: resource benchmarks and defaults, schema-artifact/runtime drift checks, abort/limit review, public API/docs cleanup, and release-checklist reconciliation.
+Issue #16 / PR #17 hardens the v0.1 release candidate. After that PR is reviewed and merged, the remaining release mechanics are intentionally separate: finalize release notes/version metadata, retest the exact tag candidate, and only then decide whether to publish/tag/create a GitHub Release.
 
 ---
 

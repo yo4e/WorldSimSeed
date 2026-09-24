@@ -1,7 +1,7 @@
 # WorldSimSeed v0.1 security model
 
-Status: design constraint for v0.1  
-Related issue: [#5](https://github.com/yo4e/WorldSimSeed/issues/5)
+Status: release-candidate constraint for v0.1  
+Related issues: [#5](https://github.com/yo4e/WorldSimSeed/issues/5), [#16](https://github.com/yo4e/WorldSimSeed/issues/16)
 
 ## 1. Security goal
 
@@ -48,6 +48,8 @@ Raw JSON/YAML-like input must be parsed into ordinary data and validated against
 
 Unknown or unsupported constructs fail closed. Implementations should not silently reinterpret invalid input.
 
+The JSON Schema artifact captures the structural contract. Runtime structural + semantic validation remains authoritative for execution, and CI runs shared positive/negative fixtures through both paths to detect structural drift.
+
 ### 4.2 Expression evaluation
 
 Expressions must run in a purpose-built, default-deny evaluator.
@@ -70,7 +72,7 @@ At minimum, the names `__proto__`, `prototype`, and `constructor` must be reject
 
 The runner executes validated internal structures only. A spec cannot create arbitrary loops, recursion, threads, timers, workers, subprocesses, or host callbacks.
 
-The runtime must count work and stop when configured limits are reached.
+The runtime counts work and stops when configured limits are reached.
 
 ### 4.4 Embedding
 
@@ -79,6 +81,8 @@ The host application owns any capability that reaches outside the pure simulatio
 A future capability such as loading a remote spec, resolving an include, or calling a host callback must be an explicit host API with its own allowlist and permission model. It is not implicitly granted by fields inside a world spec.
 
 For v0.1, world specs themselves have **no network, filesystem, import/include, or arbitrary URL-fetch capability**.
+
+The browser `<world-sim>` adapter may fetch its host-supplied `src` URL, but this is a host capability rather than a world-spec capability. The component uses `credentials: "omit"` so ambient credentials are not silently attached to that fetch.
 
 ## 5. v0.1 prohibited features
 
@@ -103,53 +107,69 @@ A later version may add selected capabilities only behind a new documented secur
 
 ### 6.1 Required limits
 
-The host-facing execution API must support explicit limits for at least:
+The host-facing execution API supports explicit limits for at least:
 
 - maximum agents,
 - maximum steps/ticks per world,
 - maximum batch runs,
-- maximum emitted/processed events,
-- maximum trace/event-log records or bytes,
-- a wall-clock or cooperative abort mechanism.
+- maximum emitted events,
+- maximum retained trace/event-log records,
+- a cooperative abort mechanism for browser Worker execution.
 
-If observers can allocate data proportional to runtime size, their retained output must also be bounded.
+Observer retention is bounded indirectly by the finite step and agent ceilings. v0.1 does not claim a separate byte quota for every observer result; see [known limitations](known-limitations-v0.1.md).
 
 ### 6.2 Defaults
 
-v0.1 must ship with conservative finite defaults. **The numeric defaults are not fixed by this document.** They should be selected after benchmark work on representative browser and Node.js environments.
+The v0.1 release-candidate defaults are:
 
-The illustrative numbers in Issue #5 are therefore treated as capacity hypotheses, not API promises.
+```text
+maxAgents       5,000
+maxSteps          500
+maxRuns           100
+maxEvents   1,000,000
+maxTraceRecords 50,000
+```
+
+The `<world-sim>` component uses the same ceilings with `maxRuns = 1` because it represents one simulation session rather than a batch runner.
+
+These values were selected after representative Node.js and Chromium probes. The method, environment, results, and rationale are recorded in [resource benchmark and v0.1 defaults](resource-benchmark-v0.1.md).
 
 Hosts may request lower limits. Raising limits above project defaults is an explicit host decision, never something a world spec can do for itself.
 
 ### 6.3 Preflight and runtime enforcement
 
-Validation or a dry-run/estimate path should reject obviously impossible requests before execution when cost can be estimated.
+Validation rejects agent and declared-step requests that already exceed host ceilings. Batch expansion checks `maxRuns` before execution.
 
-Runtime counters remain authoritative because static estimates may be imperfect. Crossing a limit must terminate the run with a typed/structured limit error rather than silently truncating state.
+Runtime counters remain authoritative where cost depends on actual execution. Crossing `maxEvents` or `maxTraceRecords` terminates the run with a typed `RESOURCE_LIMIT` error rather than silently truncating state.
 
-### 6.4 Browser responsiveness
+### 6.4 Browser responsiveness and abort
 
-Potentially heavy execution must not assume unlimited browser main-thread time.
+Potentially heavy browser execution runs in a module Worker rather than a long main-thread loop. Worker `run()` executes in chunks and yields between chunks so host cancellation can be observed.
 
-The eventual browser architecture should use a Worker and/or cooperative yielding for work that can exceed an interactive frame budget. Resource limits remain required even when a Worker is used.
+Cancellation is cooperative, not preemptive: a current step/chunk boundary must be reached before the stop is observed. A cancelled Worker session can be resumed from its current deterministic state. Resource limits remain required even though a Worker is used.
+
+Chromium CI includes a responsiveness probe that verifies main-thread timers continue to fire during a representative Worker run, plus a cancel/resume test at the Worker-service boundary.
+
+Node/headless v0.1 does not provide an internal wall-clock kill switch. Hosts that require one must impose an external process/time budget; this is documented as a v0.1 limitation.
 
 ## 7. Reproducibility and provenance
 
-A successful export/run manifest should be able to record:
+A successful run manifest records:
 
 - engine version,
 - world-spec version,
 - stable spec hash,
-- random seed or seed sequence,
-- execution parameters,
+- concrete random seed,
+- resolved execution parameters,
 - active resource-limit configuration,
-- observer/trace configuration,
-- timestamp as provenance metadata only.
+- observer IDs and trace configuration,
+- completed terminal status.
 
-A timestamp must not affect deterministic simulation results.
+The engine-generated v0.1 manifest deliberately omits wall-clock timestamps. A host may attach timestamp/provenance metadata outside the deterministic manifest, but it must not affect simulation semantics or the canonical spec hash.
 
-If a run terminates because of a limit or validation error, the result must not be presented as a normal completed deterministic run.
+If a run terminates because of a limit, validation, numeric error, or cancellation, it must not be presented as a normal completed deterministic run. In v0.1, failed runs throw typed errors and browser cancellation does not become exportable through `exportRun()` until a resumed run completes.
+
+See [run manifest v0.1](run-manifest-v0.1.md).
 
 ## 8. AI-generated specs
 
@@ -172,11 +192,11 @@ Warnings are advisory. Hard boundaries are enforced by the validator/evaluator/r
 | --- | --- |
 | Arbitrary code execution | Data-only spec, allowlisted evaluator, no JS escape hatches |
 | Prototype/property escape | Declared paths only; reject dangerous property names; no reflective traversal |
-| SSRF / unwanted network access | No spec-driven fetch or URL capability |
+| SSRF / unwanted network access | No spec-driven fetch or URL capability; host `src` fetch omits credentials |
 | Local file/process access | No filesystem/process/module APIs in evaluator |
-| CPU denial of service | Finite agents/steps/runs/events plus abort/time budget |
-| Memory exhaustion | Bounded agents, traces, events, observer retention; fail with limit error |
-| Main-thread freeze | Conservative defaults plus Worker/cooperative execution strategy |
+| CPU denial of service | Finite agents/steps/runs/events plus cooperative browser abort; external Node time budget where required |
+| Memory exhaustion | Bounded agents, traces, events, steps/runs; fail with limit error |
+| Main-thread freeze | Worker execution, chunk yielding, conservative defaults |
 | Infinite loops/recursion | Not expressible in v0.1 world spec |
 | Path traversal through includes | Includes/imports not supported in v0.1 |
 | Malicious AI-generated spec | Same validation, allowlists, and limits as every untrusted spec |
@@ -204,6 +224,8 @@ v0.1 must not be released until executable implementation can demonstrate, with 
 - prototype/property escape cases reject,
 - network/filesystem/import capability is absent from spec execution,
 - configured resource limits actually stop work,
-- same spec + parameters + engine version + seed produces the expected deterministic result contract.
+- browser cancellation remains cooperative and resumable,
+- same spec + parameters + engine version + seed produces the expected deterministic result contract,
+- Node/headless and Chromium Worker acceptance fixtures agree.
 
-See [v0.1 release checklist](v0.1-release-checklist.md).
+These gates are exercised by the Node hardening tests, Worker-service tests, Chromium E2E, package smoke, and CI workflow. See [v0.1 release checklist](v0.1-release-checklist.md).
