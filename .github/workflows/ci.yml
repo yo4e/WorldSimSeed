@@ -9,7 +9,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     steps:
       - uses: actions/checkout@v4
@@ -21,11 +21,38 @@ jobs:
       - name: Install
         run: npm install --ignore-scripts
 
+      - name: Production dependency audit
+        run: npm audit --omit=dev --audit-level=high
+
       - name: Typecheck
         run: npm run typecheck
 
       - name: Test
         run: npm test
+
+      - name: Node release benchmark
+        run: npm run benchmark:release
+
+      - name: Package dry run
+        run: npm run package:check
+
+      - name: Clean package install smoke
+        shell: bash
+        run: |
+          TGZ="$(npm pack --silent)"
+          TMP="$(mktemp -d)"
+          cd "$TMP"
+          npm init --yes >/dev/null
+          npm install "$GITHUB_WORKSPACE/$TGZ" --ignore-scripts >/dev/null
+          node --input-type=module <<'NODE'
+          import { DEFAULT_RESOURCE_LIMITS } from "worldsimseed";
+          await import("worldsimseed/spec");
+          await import("worldsimseed/core");
+          await import("worldsimseed/runner");
+          if (DEFAULT_RESOURCE_LIMITS.maxSteps !== 500) {
+            throw new Error("unexpected packaged resource defaults");
+          }
+          NODE
 
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
