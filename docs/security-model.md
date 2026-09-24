@@ -1,7 +1,7 @@
 # WorldSimSeed v0.1 security model
 
-Status: release-candidate constraint for v0.1  
-Related issues: [#5](https://github.com/yo4e/WorldSimSeed/issues/5), [#16](https://github.com/yo4e/WorldSimSeed/issues/16)
+Status: released security boundary for WorldSimSeed v0.1.0  
+Related issues: [#5](https://github.com/yo4e/WorldSimSeed/issues/5), [#16](https://github.com/yo4e/WorldSimSeed/issues/16), [#20](https://github.com/yo4e/WorldSimSeed/issues/20)
 
 ## 1. Security goal
 
@@ -11,7 +11,7 @@ The central rule is:
 
 > **A world spec is untrusted data, not code.**
 
-This document defines the minimum boundary that must be true before a v0.1 runtime is considered releasable.
+This document defines the minimum boundary required by the v0.1 runtime.
 
 ## 2. Assets to protect
 
@@ -120,7 +120,7 @@ Observer retention is bounded indirectly by the finite step and agent ceilings. 
 
 ### 6.2 Defaults
 
-The v0.1 release-candidate defaults are:
+The v0.1 defaults are:
 
 ```text
 maxAgents       5,000
@@ -217,7 +217,7 @@ Those may matter to deployments, but they require separate threat models.
 
 ## 11. Release gate
 
-v0.1 must not be released until executable implementation can demonstrate, with tests where applicable:
+The v0.1 release gate requires executable implementation to demonstrate, with tests where applicable:
 
 - no arbitrary-code path from world spec to host,
 - invalid/unknown operations reject cleanly,

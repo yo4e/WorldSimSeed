@@ -1,6 +1,6 @@
 # Run manifest v0.1
 
-Status: release-candidate contract for Issue #16  
+Status: released contract for WorldSimSeed v0.1.0  
 World format: [world-spec-v0.1.md](world-spec-v0.1.md)
 
 ## Purpose
@@ -101,11 +101,11 @@ For `selected`, an explicit seed list identifies runs whose event trace is retai
 
 The experiment request may lower host limits. It cannot raise them above limits granted by the embedding host/runtime. The effective limit is the stricter value.
 
-The release-candidate defaults and benchmark evidence are documented in [resource-benchmark-v0.1.md](resource-benchmark-v0.1.md).
+The v0.1 defaults and benchmark evidence are documented in [resource-benchmark-v0.1.md](resource-benchmark-v0.1.md).
 
 ## Run manifest
 
-Every successfully completed `runWorld()` call emits a resolved manifest. The development build records `0.1.0-dev.0`; the separate release operation will set the package/engine version to `0.1.0`.
+Every successfully completed `runWorld()` call emits a resolved manifest. WorldSimSeed v0.1.0 records engine version `0.1.0`.
 
 Representative manifest:
 
@@ -114,7 +114,7 @@ manifestVersion: "0.1"
 
 engine:
   name: WorldSimSeed
-  version: 0.1.0-dev.0
+  version: 0.1.0
   randomModel: keyed-fnv1a-mulberry32-v1
 
 world:

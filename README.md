@@ -12,9 +12,11 @@ WorldSimSeed は、**確率・エージェント・時間・イベント・観�
 
 ## Status
 
-**v0.1 release candidate hardening.**
+**v0.1.0.**
 
-Node/headless、batch runner、browser Worker、最小Web Component `<world-sim>` のvertical sliceは成立済みです。現在はv0.1公開前のrelease gateとして、resource limits、schema/runtime parity、security negative tests、package surface、公開APIと既知制約を固定しています。npm publish / `v0.1.0` tag / GitHub Releaseは別の明示的なrelease操作として扱います。
+Node/headless、batch runner、browser Worker、最小Web Component `<world-sim>` のvertical sliceをv0.1.0の基準線として公開します。resource limits、schema/runtime parity、security negative tests、package surface、公開API、既知制約をv0.1 contractとして固定し、GitHub Pagesで実ブラウザ経路のデモも公開しています。
+
+v0.1.0はGitHub Releaseとして公開し、`package.json` の `private: true` は維持します。npm publishはこのリリースには含みません。
 
 ## Core idea
 
@@ -247,7 +249,7 @@ WorldSimSeed is designed on the assumption that an external world spec is **untr
 
 For v0.1, a world spec is data rather than executable host code. Arbitrary JavaScript, spec-driven network/filesystem access, imports/includes, unbounded loops/recursion, and host-object access are outside the v0.1 boundary. Expression evaluation uses an explicit allowlist, and execution remains subject to finite host-controlled resource limits.
 
-Release-candidate defaults are:
+v0.1 defaults are:
 
 ```text
 maxAgents       5,000
@@ -279,7 +281,7 @@ WorldSimSeed is released under the [MIT License](LICENSE).
 
 ## Next starting point
 
-Issue #18 publishes the real browser vertical slice as a GitHub Pages demo. After that deployment is verified, the remaining v0.1 release mechanics are intentionally separate: finalize release notes/version metadata, retest the exact tag candidate, and only then decide whether to publish/tag/create a GitHub Release.
+v0.1.0 establishes the first released baseline. Further work can improve the demo, visualization, ergonomics, integrations, and later world-spec capabilities while keeping the released v0.1 contract and known limitations explicit.
 
 ---
 

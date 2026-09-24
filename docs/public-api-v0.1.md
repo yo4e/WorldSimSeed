@@ -1,6 +1,6 @@
 # Public API v0.1
 
-This document defines the intended public package surface for the v0.1 release candidate. Files below `dist/` that are not reachable through these package exports are implementation details.
+This document defines the public package surface for WorldSimSeed v0.1.0. Files below `dist/` that are not reachable through these package exports are implementation details.
 
 ## Package entry points
 
@@ -22,7 +22,7 @@ Every export has a matching generated `.d.ts` entry in `package.json`.
 import { DEFAULT_RESOURCE_LIMITS } from "worldsimseed";
 ```
 
-The v0.1 release-candidate defaults are:
+The v0.1 defaults are:
 
 ```ts
 {

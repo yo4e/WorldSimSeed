@@ -3,7 +3,7 @@ import { WorldSimError } from "../errors.js";
 import type { CompiledWorld, ResourceLimits, Scalar } from "../spec/index.js";
 import { RANDOM_MODEL } from "../spec/random.js";
 
-export const ENGINE_VERSION = "0.1.0-dev.0";
+export const ENGINE_VERSION = "0.1.0";
 
 export interface RunWorldOptions {
   seed: number;
