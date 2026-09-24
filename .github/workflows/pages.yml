@@ -36,7 +36,7 @@ jobs:
       - name: Assemble static Pages artifact
         run: |
           mkdir -p _site/dist _site/examples
-          cp pages/index.html _site/index.html
+          cp index.html _site/index.html
           cp -R dist/src _site/dist/src
           cp examples/talent-luck.world.yaml _site/examples/talent-luck.world.yaml
           touch _site/.nojekyll
@@ -45,7 +45,7 @@ jobs:
         uses: actions/configure-pages@v5
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: _site
 
