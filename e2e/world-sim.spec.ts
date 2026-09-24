@@ -102,6 +102,142 @@ observers: []
   expect(detail).not.toHaveProperty("stack");
 });
 
+test("world-sim component methods step, reset, inspect, cancel, resume, and export", async ({ page }) => {
+  await page.goto("/examples/web/index.html");
+
+  const result = await page.evaluate(async () => {
+    type View = {
+      status: string;
+      cancelled?: boolean;
+      state: { t: number; world?: Record<string, number> };
+      metrics: { t: number; values: Record<string, unknown> };
+    };
+    type ElementApi = HTMLElement & {
+      load(input: Record<string, unknown>): Promise<View>;
+      step(): Promise<View>;
+      run(chunkSize?: number): Promise<View & { cancelled: boolean }>;
+      cancel(): Promise<{ cancelled: boolean }>;
+      reset(options?: { seed?: number }): Promise<View>;
+      getState(): Promise<View["state"]>;
+      getMetrics(): Promise<View["metrics"]>;
+      exportRun(): Promise<{ finalState: View["state"] }>;
+    };
+
+    const element = document.createElement("world-sim") as ElementApi;
+    document.body.append(element);
+
+    await element.load({
+      specVersion: "0.1",
+      id: "component-api",
+      time: { steps: 500 },
+      world: {
+        state: {
+          counter: { type: "number", mutable: true, init: 0 },
+        },
+      },
+      events: [
+        {
+          id: "increment",
+          scope: "world",
+          effects: [{ target: "world.counter", op: "add", value: 1 }],
+        },
+      ],
+      observers: [{ id: "counter", type: "value", source: "world.counter" }],
+    });
+
+    const stepped = await element.step();
+    const stateAfterStep = await element.getState();
+    const metricsAfterStep = await element.getMetrics();
+    const reset = await element.reset({ seed: 42 });
+
+    const runPromise = element.run(1);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const cancel = await element.cancel();
+    const interrupted = await runPromise;
+    const resumed = await element.run(32);
+    const exported = await element.exportRun();
+
+    return {
+      steppedT: stepped.state.t,
+      stateT: stateAfterStep.t,
+      metricsT: metricsAfterStep.t,
+      resetT: reset.state.t,
+      cancelAcknowledged: cancel.cancelled,
+      interruptedCancelled: interrupted.cancelled,
+      interruptedT: interrupted.state.t,
+      resumedStatus: resumed.status,
+      resumedT: resumed.state.t,
+      exportedT: exported.finalState.t,
+    };
+  });
+
+  expect(result.steppedT).toBe(1);
+  expect(result.stateT).toBe(1);
+  expect(result.metricsT).toBe(1);
+  expect(result.resetT).toBe(0);
+  expect(result.cancelAcknowledged).toBe(true);
+  expect(result.interruptedCancelled).toBe(true);
+  expect(result.interruptedT).toBeLessThan(500);
+  expect(result.resumedStatus).toBe("completed");
+  expect(result.resumedT).toBe(500);
+  expect(result.exportedT).toBe(500);
+});
+
+test("world-sim src fetch is host-owned and omits ambient credentials", async ({ page }) => {
+  await page.goto("/examples/web/index.html");
+
+  const credentials = await page.evaluate(async () => {
+    const target = "https://example.invalid/untrusted.world.yaml";
+    const source = `
+specVersion: "0.1"
+id: host-fetch-boundary
+time:
+  steps: 1
+world:
+  state:
+    x:
+      type: number
+      init: 1
+events: []
+observers: []
+`;
+
+    const originalFetch = window.fetch.bind(window);
+    let captured: RequestCredentials | undefined;
+    window.fetch = async (input, init) => {
+      const url = typeof input === "string" ? input : input.url;
+      if (url === target) {
+        captured = init?.credentials;
+        return new Response(source, {
+          status: 200,
+          headers: { "content-type": "text/yaml" },
+        });
+      }
+      return originalFetch(input, init);
+    };
+
+    try {
+      const element = document.createElement("world-sim");
+      element.setAttribute("src", target);
+      const ready = new Promise<void>((resolve, reject) => {
+        element.addEventListener("worldsim-ready", () => resolve(), { once: true });
+        element.addEventListener(
+          "worldsim-error",
+          (event) => reject(new Error(JSON.stringify((event as CustomEvent).detail))),
+          { once: true },
+        );
+      });
+      document.body.append(element);
+      await ready;
+      return captured;
+    } finally {
+      window.fetch = originalFetch;
+    }
+  });
+
+  expect(credentials).toBe("omit");
+});
+
 test("worker run keeps the browser main thread responsive", async ({ page }) => {
   await page.goto("/examples/web/index.html");
 
