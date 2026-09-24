@@ -1,6 +1,7 @@
 # Resource benchmark and v0.1 defaults
 
-Related: [Issue #16](https://github.com/yo4e/WorldSimSeed/issues/16)
+Related: [Issue #16](https://github.com/yo4e/WorldSimSeed/issues/16)  
+Evidence: [PR #17 CI run 35977839945](https://github.com/yo4e/WorldSimSeed/actions/runs/35977839945)
 
 This document records the benchmark method used to choose conservative v0.1 host defaults. The benchmark is a capacity probe, not a performance promise. Absolute timings vary by CPU, browser, Node.js version, thermal state, and surrounding workload.
 
@@ -45,26 +46,36 @@ Batch probes use a 100-agent × 50-step world at 10, 50, and 100 runs. Batch res
 
 Playwright includes a browser-side workload of 2,000 agents × 200 steps through `<world-sim>`. The test records `WSS_BROWSER_BENCH` and verifies that main-thread timers continue to fire while the Worker is running. There is deliberately no millisecond threshold in the release gate.
 
-The existing browser gate separately verifies same-seed headless ↔ Worker result parity and cooperative cancel/resume behavior.
+The existing browser and Worker gates separately verify same-seed headless ↔ Worker result parity and cooperative cancel/resume behavior.
 
 ## Recorded CI evidence
 
-The authoritative evidence for this change is the CI run attached to the Issue #16 pull request. After that run completes, this section is updated with the observed environment and benchmark records before the PR is considered ready to merge.
+The first release-candidate benchmark was recorded on 2026-09-24 in PR #17 CI. Environment:
 
-| Probe | Duration | RSS end | Notes |
-| --- | ---: | ---: | --- |
-| 1,000 × 100, trace off | pending | pending | Node release benchmark |
-| 5,000 × 500, trace off | pending | pending | Node release benchmark |
-| 10,000 × 100, trace off | pending | pending | upper-capacity probe |
-| 1,000 × 100, trace on | pending | pending | retained trace |
-| batch 10 | pending | pending | 100 agents × 50 steps per run |
-| batch 50 | pending | pending | 100 agents × 50 steps per run |
-| batch 100 | pending | pending | 100 agents × 50 steps per run |
-| browser 2,000 × 200 | pending | n/a | main-thread responsiveness checked |
+- Ubuntu 24.04.5 (`ubuntu-24.04` hosted runner)
+- Node.js `v22.23.2`, npm `10.9.8`
+- x64, 4 exposed CPUs
+- AMD EPYC 9V74 80-Core Processor
+- about 15,990 MiB total memory visible to the runner
+
+| Probe | Duration | RSS end | RSS delta | Notes |
+| --- | ---: | ---: | ---: | --- |
+| 1,000 × 100, trace off | 30.2 ms | 54.0 MiB | +5.5 MiB | 5,074 emitted events |
+| 5,000 × 500, trace off | 521.0 ms | 62.2 MiB | +8.1 MiB | 125,140 emitted events |
+| 10,000 × 100, trace off | 225.0 ms | 72.1 MiB | +9.9 MiB | upper-capacity probe; 49,885 events |
+| 1,000 × 100, trace on | 29.0 ms | 72.6 MiB | +0.5 MiB | 5,074 retained trace records |
+| batch 10 | 22.1 ms | 72.1 MiB | -0.5 MiB | 100 agents × 50 steps per run |
+| batch 50 | 67.3 ms | 71.9 MiB | -0.2 MiB | 100 agents × 50 steps per run |
+| batch 100 | 112.8 ms | 72.1 MiB | +0.1 MiB | 100 agents × 50 steps per run |
+| browser 2,000 × 200 | 146.2 ms | n/a | n/a | main-thread timer fired 41 times; run completed |
+
+RSS values are process snapshots, not peak-memory measurements. The negative deltas in some batch probes are expected GC noise and must not be interpreted as negative allocation. The benchmark is intentionally evidence for conservative defaults rather than a stable throughput SLA.
+
+The same CI run also passed 21/21 Node tests, three Chromium E2E tests, production dependency audit, package dry-run, clean tarball install/import smoke, and both reference demos.
 
 ## Why these defaults
 
-`maxAgents: 5_000` keeps the default at the middle representative scale rather than treating the 10,000-agent probe as a promise.
+`maxAgents: 5_000` keeps the default at the middle representative scale rather than treating the successful 10,000-agent capacity probe as a promise.
 
 `maxSteps: 500` matches the representative long-run probe and avoids the earlier development value of 5,000–10,000 steps, which multiplied with high agent counts too aggressively.
 
