@@ -211,6 +211,12 @@ export class WorldSimElement extends HTMLElement {
     );
   }
 
+  async getTrace() {
+    return this.perform(async () =>
+      this.ensureLoaded().then((client) => client.getTrace()),
+    );
+  }
+
   async exportRun(): Promise<WebRunExport> {
     return this.perform(async () =>
       this.ensureLoaded().then((client) => client.exportRun()),
