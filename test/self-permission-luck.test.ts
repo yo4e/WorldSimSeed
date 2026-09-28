@@ -48,8 +48,8 @@ test("self-permission luck world runs as a paired counterfactual", async () => {
   assert.equal(baselineAgents.length, biasedAgents.length);
 
   assert.deepEqual(
-    baselineAgents.map((agent) => agent.self_permission),
-    biasedAgents.map((agent) => agent.self_permission),
+    baselineAgents.map((agent) => agent.state.self_permission),
+    biasedAgents.map((agent) => agent.state.self_permission),
   );
 
   assert.ok(biased.eventCount > baseline.eventCount);
@@ -60,7 +60,8 @@ test("self-permission luck world runs as a paired counterfactual", async () => {
 
   for (let index = 0; index < baselineAgents.length; index += 1) {
     assert.ok(
-      Number(biasedAgents[index].wealth) >= Number(baselineAgents[index].wealth),
+      Number(biasedAgents[index].state.wealth) >=
+        Number(baselineAgents[index].state.wealth),
     );
   }
 });
