@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="Run the WorldSimSeed deterministic browser demo with the real Web Component and module Worker runtime.">
+  <meta name="description" content="Run and understand the WorldSimSeed deterministic Talent × Luck browser demo.">
   <title>WorldSimSeed browser demo</title>
   <style>
     :root {
@@ -12,11 +12,14 @@
       color-scheme: light dark;
       --page: light-dark(#f6f7f2, #111512);
       --panel: light-dark(#ffffff, #18201a);
+      --panel-soft: light-dark(#f0f3ed, #202a22);
       --text: light-dark(#182018, #eff7ef);
       --muted: light-dark(#586358, #aebcaf);
       --line: light-dark(#d8ded7, #344137);
       --accent: light-dark(#17643b, #79dc9d);
       --accent-soft: light-dark(#e4f4e8, #183824);
+      --warm: light-dark(#8b4e10, #f0b66d);
+      --warm-soft: light-dark(#fff0dc, #3a2a18);
     }
 
     * { box-sizing: border-box; }
@@ -29,14 +32,15 @@
     }
 
     main {
-      width: min(880px, calc(100% - 2rem));
+      width: min(1040px, calc(100% - 2rem));
       margin: 0 auto;
       padding: 4rem 0 3rem;
     }
 
     header { margin-bottom: 2rem; }
 
-    .eyebrow {
+    .eyebrow,
+    .kicker {
       margin: 0 0 0.5rem;
       color: var(--accent);
       font-size: 0.78rem;
@@ -52,19 +56,89 @@
       letter-spacing: -0.055em;
     }
 
+    h2, h3 { letter-spacing: -0.02em; }
+
     .lead {
-      max-width: 680px;
+      max-width: 720px;
       margin: 1.25rem 0 0;
       color: var(--muted);
       font-size: clamp(1rem, 2.5vw, 1.2rem);
       line-height: 1.65;
     }
 
+    .world-brief,
     .demo {
-      padding: clamp(1rem, 3vw, 1.5rem);
       border: 1px solid var(--line);
       border-radius: 1.25rem;
       background: var(--panel);
+    }
+
+    .world-brief {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(16rem, 0.8fr);
+      gap: 1.5rem;
+      margin-bottom: 1rem;
+      padding: clamp(1.1rem, 3vw, 1.6rem);
+    }
+
+    .world-brief h2 {
+      margin: 0 0 0.65rem;
+      font-size: clamp(1.45rem, 4vw, 2.2rem);
+    }
+
+    .world-brief p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .rules {
+      display: grid;
+      gap: 0.55rem;
+      margin: 1rem 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .rules li {
+      display: grid;
+      grid-template-columns: 1.6rem 1fr;
+      gap: 0.55rem;
+      align-items: start;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .rules strong { color: var(--text); }
+
+    .rule-icon {
+      display: grid;
+      place-items: center;
+      width: 1.6rem;
+      height: 1.6rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    .notice {
+      align-self: start;
+      padding: 1rem;
+      border-radius: 0.9rem;
+      background: var(--accent-soft);
+    }
+
+    .notice h3 {
+      margin: 0 0 0.5rem;
+      font-size: 1rem;
+    }
+
+    .notice p + p { margin-top: 0.65rem; }
+
+    .demo {
+      padding: clamp(1rem, 3vw, 1.5rem);
       box-shadow: 0 1.5rem 4rem light-dark(rgb(32 55 38 / 8%), rgb(0 0 0 / 24%));
     }
 
@@ -73,7 +147,8 @@
       flex-wrap: wrap;
       align-items: end;
       gap: 0.75rem 1rem;
-      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--line);
     }
 
     label {
@@ -85,9 +160,7 @@
     }
 
     input,
-    button {
-      font: inherit;
-    }
+    button { font: inherit; }
 
     input {
       width: 11rem;
@@ -110,24 +183,213 @@
     }
 
     .seed-note {
-      flex: 1 1 18rem;
+      flex: 1 1 20rem;
       margin: 0;
       color: var(--muted);
       font-size: 0.9rem;
       line-height: 1.5;
     }
 
+    .seed-note strong { color: var(--text); }
+
+    .state-strip {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 0.8rem;
+      align-items: center;
+      margin: 1rem 0;
+      padding: 0.8rem 0.9rem;
+      border-radius: 0.8rem;
+      background: var(--panel-soft);
+    }
+
+    .state-pill {
+      padding: 0.3rem 0.55rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .state-copy {
+      min-width: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .state-copy strong {
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .progress {
+      grid-column: 1 / -1;
+      height: 0.4rem;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--line);
+    }
+
+    .progress > span {
+      display: block;
+      width: var(--progress, 0%);
+      height: 100%;
+      border-radius: inherit;
+      background: var(--accent);
+      transition: width 180ms ease-out;
+    }
+
     world-sim {
       --worldsim-background: var(--page);
       --worldsim-foreground: var(--text);
+      display: block;
+      margin-bottom: 1rem;
     }
 
-    world-sim::part(shell) {
-      border-color: var(--line);
+    world-sim::part(shell) { border-color: var(--line); }
+    world-sim::part(metrics) { display: none; }
+
+    .insight-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 0.7rem;
     }
 
-    world-sim::part(metrics) {
+    .metric {
+      min-width: 0;
+      padding: 0.9rem;
+      border: 1px solid var(--line);
+      border-radius: 0.85rem;
+      background: var(--page);
+    }
+
+    .metric-label {
+      display: block;
+      min-height: 2.4em;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.25;
+    }
+
+    .metric-value {
+      display: block;
+      margin-top: 0.35rem;
+      font-size: clamp(1.15rem, 3vw, 1.55rem);
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .metric-delta {
+      display: block;
+      min-height: 1.35em;
+      margin-top: 0.25rem;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .explain-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.72fr);
+      gap: 0.8rem;
+      margin-top: 0.8rem;
+    }
+
+    .activity,
+    .distribution {
+      padding: 1rem;
+      border: 1px solid var(--line);
+      border-radius: 0.9rem;
+      background: var(--page);
+    }
+
+    .activity h3,
+    .distribution h3 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .activity-sub,
+    .distribution-sub {
+      margin: 0.3rem 0 0;
+      color: var(--muted);
       font-size: 0.82rem;
+      line-height: 1.45;
+    }
+
+    .event-list {
+      display: grid;
+      gap: 0.55rem;
+      margin: 0.9rem 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .event-list li {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.65rem;
+      align-items: baseline;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .event-count {
+      min-width: 3.1rem;
+      color: var(--text);
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .histogram {
+      display: flex;
+      align-items: end;
+      gap: 2px;
+      height: 7.5rem;
+      margin-top: 0.9rem;
+      padding-top: 0.4rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .histogram span {
+      flex: 1 1 0;
+      min-width: 2px;
+      height: var(--bar, 0%);
+      border-radius: 2px 2px 0 0;
+      background: var(--accent);
+      opacity: 0.82;
+    }
+
+    .histogram-axis {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-top: 0.35rem;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    details {
+      margin-top: 0.8rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    summary { cursor: pointer; }
+
+    .raw-metrics {
+      overflow: auto;
+      max-height: 18rem;
+      margin: 0.6rem 0 0;
+      padding: 0.8rem;
+      border-radius: 0.7rem;
+      background: var(--page);
+      color: var(--text);
+      font-size: 0.75rem;
       line-height: 1.45;
     }
 
@@ -164,6 +426,8 @@
       font-weight: 800;
     }
 
+    .how strong { color: var(--text); }
+
     .notes {
       margin-top: 1.5rem;
       color: var(--muted);
@@ -183,9 +447,23 @@
 
     a { color: var(--accent); }
 
+    @media (max-width: 820px) {
+      .world-brief,
+      .explain-grid { grid-template-columns: 1fr; }
+      .insight-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .metric:last-child { grid-column: 1 / -1; }
+    }
+
     @media (max-width: 640px) {
       main { padding-top: 2.5rem; }
       .how { grid-template-columns: 1fr; }
+      .state-strip { grid-template-columns: 1fr auto; }
+      .state-pill { justify-self: start; }
+      .insight-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .progress > span { transition: none; }
     }
   </style>
 </head>
@@ -195,11 +473,31 @@
       <p class="eyebrow">Live browser demo</p>
       <h1>WorldSimSeed</h1>
       <p class="lead">
-        Write the rules, run the world, and inspect what emerges. This page runs the real
-        WorldSimSeed browser runtime locally in your browser with a module Worker. No simulation
-        server is involved.
+        A tiny deterministic world, shown in human terms. Step through it, run forty simulated years,
+        and watch luck, talent, and inequality pull the same starting population apart.
       </p>
     </header>
+
+    <section class="world-brief" aria-labelledby="world-title">
+      <div>
+        <p class="kicker">Reference world · Talent × Luck</p>
+        <h2 id="world-title">1,000 people start equally wealthy. Then chance gets a vote.</h2>
+        <p>
+          Everyone begins with wealth 10. Talent is fixed at birth. Each half-year, lucky opportunities
+          can double wealth and misfortunes can halve it. The world runs for 80 steps, or 40 simulated years.
+        </p>
+        <ul class="rules">
+          <li><span class="rule-icon">T</span><span><strong>Talent</strong> is distributed around 0.6 and does not change during the run.</span></li>
+          <li><span class="rule-icon">+</span><span><strong>Lucky opportunity</strong> has a 10% × talent chance per person per step and doubles wealth.</span></li>
+          <li><span class="rule-icon">−</span><span><strong>Misfortune</strong> has a 10% chance per person per step and halves wealth.</span></li>
+        </ul>
+      </div>
+      <aside class="notice">
+        <h3>What should I notice?</h3>
+        <p>Watch inequality and the wealth spread grow even though everyone starts at the same wealth.</p>
+        <p>Then compare that with the talent ↔ wealth correlation. A positive correlation can coexist with a large role for luck.</p>
+      </aside>
+    </section>
 
     <section class="demo" aria-labelledby="demo-title">
       <div class="toolbar">
@@ -208,23 +506,82 @@
           <input id="seed" name="seed" type="number" min="0" max="4294967295" step="1" value="42" inputmode="numeric">
         </label>
         <button class="apply" id="apply-seed" type="button">Apply seed</button>
-        <p class="seed-note" id="seed-note">Try a run, change the seed, then return to 42. The same world + seed reproduces the same deterministic result.</p>
+        <p class="seed-note" id="seed-note">
+          <strong>Same world + same seed = same result.</strong> Change the seed to explore another possible history, then return to 42 to replay it exactly.
+        </p>
+      </div>
+
+      <div class="state-strip" aria-live="polite">
+        <span class="state-pill" id="demo-status">Loading</span>
+        <span class="state-copy"><strong id="step-label">Step 0 / 80</strong> · <span id="time-label">Year 0 of 40</span></span>
+        <span class="state-copy" id="action-label">Preparing world…</span>
+        <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
       </div>
 
       <h2 id="demo-title" hidden>Talent and luck sample simulation</h2>
-      <world-sim id="simulation" src="./examples/talent-luck.world.yaml" seed="42"></world-sim>
+      <world-sim id="simulation" seed="42"></world-sim>
+
+      <div class="insight-grid" aria-label="Key metrics">
+        <div class="metric">
+          <span class="metric-label">Average wealth</span>
+          <span class="metric-value" id="mean-wealth">—</span>
+          <span class="metric-delta" id="mean-wealth-delta">Starting at 10</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Inequality · Gini</span>
+          <span class="metric-value" id="wealth-gini">—</span>
+          <span class="metric-delta" id="wealth-gini-delta">0 = equal</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Talent ↔ wealth correlation</span>
+          <span class="metric-value" id="talent-correlation">—</span>
+          <span class="metric-delta" id="talent-correlation-delta">−1 to +1</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Bottom 10% wealth</span>
+          <span class="metric-value" id="wealth-p10">—</span>
+          <span class="metric-delta" id="wealth-p10-delta">10th percentile</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Top 10% threshold</span>
+          <span class="metric-value" id="wealth-p90">—</span>
+          <span class="metric-delta" id="wealth-p90-delta">90th percentile</span>
+        </div>
+      </div>
+
+      <div class="explain-grid">
+        <section class="activity" aria-labelledby="activity-title">
+          <h3 id="activity-title">What just happened?</h3>
+          <p class="activity-sub" id="activity-sub">No events yet. Use Step to inspect one half-year at a time, or Run to finish the world.</p>
+          <ul class="event-list" id="event-list">
+            <li><span class="event-count">0</span><span>events so far</span></li>
+          </ul>
+        </section>
+
+        <section class="distribution" aria-labelledby="distribution-title">
+          <h3 id="distribution-title">Wealth distribution</h3>
+          <p class="distribution-sub">Each bar is one wealth bin across the 1,000 agents.</p>
+          <div class="histogram" id="histogram" role="img" aria-label="Wealth histogram"></div>
+          <div class="histogram-axis"><span id="hist-min">—</span><span>wealth</span><span id="hist-max">—</span></div>
+        </section>
+      </div>
+
+      <details>
+        <summary>Show raw engine metrics</summary>
+        <pre class="raw-metrics" id="raw-metrics">{}</pre>
+      </details>
     </section>
 
     <ol class="how">
-      <li><strong>Step</strong> advances one tick so you can inspect the world incrementally.</li>
-      <li><strong>Run</strong> finishes the configured simulation inside a Worker without owning the main thread.</li>
-      <li><strong>Reset</strong> returns to the selected seed. The metrics are deterministic for the same validated world and seed.</li>
+      <li><strong>Step</strong> advances one half-year. The event summary and metric deltas explain what changed.</li>
+      <li><strong>Run</strong> finishes the remaining steps in the real Worker. The summary rolls up what happened during that run.</li>
+      <li><strong>Reset</strong> returns to the selected seed. Replay the same seed to verify deterministic behavior.</li>
     </ol>
 
     <p class="notes">
-      This is the v0.1 Talent × Luck reference world. World specs are data, not executable JavaScript.
-      The browser host fetches the YAML with credentials omitted, validates it, and sends execution to
-      the same portable simulation layer used by the headless runtime.
+      This page is a presentation layer around the real v0.1 <code>&lt;world-sim&gt;</code> path.
+      The simulation semantics are unchanged: the host fetches the YAML with credentials omitted,
+      validates it, and executes it in the same portable simulation layer used by the headless runtime.
     </p>
 
     <footer>
@@ -238,12 +595,157 @@
   <script type="module">
     import "./dist/src/web/index.js";
 
+    const TOTAL_STEPS = 80;
     const simulation = document.querySelector("#simulation");
     const seedInput = document.querySelector("#seed");
     const applySeed = document.querySelector("#apply-seed");
     const seedNote = document.querySelector("#seed-note");
+    const demoStatus = document.querySelector("#demo-status");
+    const stepLabel = document.querySelector("#step-label");
+    const timeLabel = document.querySelector("#time-label");
+    const actionLabel = document.querySelector("#action-label");
+    const progressBar = document.querySelector("#progress-bar");
+    const eventList = document.querySelector("#event-list");
+    const activitySub = document.querySelector("#activity-sub");
+    const rawMetrics = document.querySelector("#raw-metrics");
+    const histogram = document.querySelector("#histogram");
+    const histMin = document.querySelector("#hist-min");
+    const histMax = document.querySelector("#hist-max");
+
+    const metricNodes = {
+      mean_wealth: [document.querySelector("#mean-wealth"), document.querySelector("#mean-wealth-delta")],
+      wealth_gini: [document.querySelector("#wealth-gini"), document.querySelector("#wealth-gini-delta")],
+      talent_wealth_correlation: [document.querySelector("#talent-correlation"), document.querySelector("#talent-correlation-delta")],
+      wealth_p10: [document.querySelector("#wealth-p10"), document.querySelector("#wealth-p10-delta")],
+      wealth_p90: [document.querySelector("#wealth-p90"), document.querySelector("#wealth-p90-delta")],
+    };
+
+    let previousMetrics;
+    let latestView;
+    let interactionStartT = 0;
+    let pendingAction = "load";
+    let lastActivityEndT = 0;
+
+    const formatNumber = (value, digits = 2) => {
+      if (typeof value !== "number" || !Number.isFinite(value)) return "—";
+      return new Intl.NumberFormat(undefined, { maximumFractionDigits: digits }).format(value);
+    };
+
+    const formatSigned = (value, digits = 2) => {
+      if (!Number.isFinite(value) || Math.abs(value) < 10 ** (-digits)) return "no change";
+      return `${value > 0 ? "+" : ""}${formatNumber(value, digits)}`;
+    };
+
+    const setState = (view, label) => {
+      const t = view?.state?.t ?? 0;
+      stepLabel.textContent = `Step ${t} / ${TOTAL_STEPS}`;
+      timeLabel.textContent = `Year ${formatNumber(t / 2, 1)} of 40`;
+      progressBar.style.setProperty("--progress", `${Math.min(100, (t / TOTAL_STEPS) * 100)}%`);
+      demoStatus.textContent = view?.status === "completed" ? "Complete" : label;
+    };
+
+    const renderMetrics = (view, compareTo = previousMetrics) => {
+      const values = view.metrics.values;
+      const digits = {
+        mean_wealth: 2,
+        wealth_gini: 3,
+        talent_wealth_correlation: 3,
+        wealth_p10: 2,
+        wealth_p90: 2,
+      };
+
+      for (const [key, [valueNode, deltaNode]] of Object.entries(metricNodes)) {
+        const value = values[key];
+        valueNode.textContent = formatNumber(value, digits[key]);
+        const before = compareTo?.[key];
+        if (typeof value === "number" && typeof before === "number") {
+          deltaNode.textContent = `${formatSigned(value - before, digits[key])} since previous view`;
+        } else if (key === "wealth_gini") {
+          deltaNode.textContent = "0 = equal · 1 = maximally unequal";
+        } else if (key === "talent_wealth_correlation") {
+          deltaNode.textContent = "−1 to +1";
+        } else {
+          deltaNode.textContent = key === "mean_wealth" ? "Starting at 10" : key === "wealth_p10" ? "10th percentile" : "90th percentile";
+        }
+      }
+
+      rawMetrics.textContent = JSON.stringify(values, null, 2);
+      renderHistogram(values.wealth_histogram);
+      previousMetrics = { ...values };
+    };
+
+    const renderHistogram = (data) => {
+      histogram.replaceChildren();
+      if (!data || !Array.isArray(data.counts) || data.counts.length === 0) {
+        histogram.setAttribute("aria-label", "Wealth histogram unavailable");
+        histMin.textContent = "—";
+        histMax.textContent = "—";
+        return;
+      }
+
+      const maxCount = Math.max(...data.counts, 1);
+      for (const count of data.counts) {
+        const bar = document.createElement("span");
+        bar.style.setProperty("--bar", `${Math.max(2, (count / maxCount) * 100)}%`);
+        bar.title = `${count} agents`;
+        histogram.append(bar);
+      }
+
+      histMin.textContent = formatNumber(data.min, 2);
+      histMax.textContent = formatNumber(data.max, 2);
+      histogram.setAttribute(
+        "aria-label",
+        `Wealth distribution from ${formatNumber(data.min, 2)} to ${formatNumber(data.max, 2)} across ${data.counts.length} bins.`,
+      );
+    };
+
+    const summarizeTrace = async (startT, endT, label) => {
+      try {
+        const exported = await simulation.exportRun();
+        const records = (exported.trace ?? []).filter((record) => record.t >= startT && record.t < endT);
+        const counts = new Map();
+        for (const record of records) counts.set(record.eventId, (counts.get(record.eventId) ?? 0) + 1);
+
+        const lucky = counts.get("lucky_opportunity") ?? 0;
+        const misfortune = counts.get("misfortune") ?? 0;
+        eventList.replaceChildren();
+
+        const rows = [
+          [lucky, "lucky opportunities doubled an agent’s wealth"],
+          [misfortune, "misfortunes halved an agent’s wealth"],
+          [records.length, "total events changed wealth"],
+        ];
+        for (const [count, text] of rows) {
+          const li = document.createElement("li");
+          const countNode = document.createElement("span");
+          countNode.className = "event-count";
+          countNode.textContent = formatNumber(count, 0);
+          const textNode = document.createElement("span");
+          textNode.textContent = text;
+          li.append(countNode, textNode);
+          eventList.append(li);
+        }
+
+        activitySub.textContent = label;
+        lastActivityEndT = endT;
+      } catch {
+        activitySub.textContent = "The simulation ran, but the human-readable event summary could not be exported.";
+      }
+    };
+
+    const renderReady = (view) => {
+      latestView = view;
+      previousMetrics = undefined;
+      lastActivityEndT = 0;
+      renderMetrics(view, undefined);
+      setState(view, "Ready");
+      actionLabel.textContent = "Ready to step or run";
+      activitySub.textContent = "No events yet. Use Step to inspect one half-year at a time, or Run to finish the world.";
+      eventList.innerHTML = '<li><span class="event-count">0</span><span>events so far</span></li>';
+    };
 
     const setSeed = () => {
+      seedInput.setCustomValidity("");
       if (!seedInput.reportValidity()) return;
       const seed = Number(seedInput.value);
       if (!Number.isSafeInteger(seed) || seed < 0 || seed > 0xffffffff) {
@@ -251,17 +753,96 @@
         seedInput.reportValidity();
         return;
       }
-      seedInput.setCustomValidity("");
+
+      pendingAction = "reset";
+      actionLabel.textContent = `Resetting to seed ${seed}…`;
       simulation.seed = seed;
-      seedNote.textContent = `Seed ${seed} applied. Run or step the same world from this deterministic starting point.`;
+      seedNote.innerHTML = `<strong>Seed ${seed} applied.</strong> Reusing this seed with the same world reproduces the same deterministic history.`;
     };
 
+    simulation.trace = true;
+    simulation.setAttribute("src", "./examples/talent-luck.world.yaml");
+
     applySeed.addEventListener("click", setSeed);
+    seedInput.addEventListener("input", () => seedInput.setCustomValidity(""));
     seedInput.addEventListener("keydown", (event) => {
       if (event.key === "Enter") setSeed();
     });
 
+    simulation.addEventListener("click", (event) => {
+      const source = event.composedPath().find((node) => node instanceof HTMLButtonElement);
+      const action = source?.dataset?.action;
+      if (!action) return;
+
+      interactionStartT = latestView?.state?.t ?? 0;
+      pendingAction = action;
+
+      if (action === "step") {
+        demoStatus.textContent = "Stepping";
+        actionLabel.textContent = `Advancing step ${interactionStartT + 1}…`;
+      } else if (action === "run") {
+        demoStatus.textContent = "Running";
+        actionLabel.textContent = `Running from step ${interactionStartT} to ${TOTAL_STEPS}…`;
+      } else if (action === "reset") {
+        demoStatus.textContent = "Resetting";
+        actionLabel.textContent = `Resetting seed ${simulation.seed}…`;
+      } else if (action === "cancel") {
+        demoStatus.textContent = "Stopping";
+        actionLabel.textContent = "Stopping after the current Worker chunk…";
+      }
+    });
+
+    simulation.addEventListener("worldsim-ready", (event) => {
+      renderReady(event.detail);
+    });
+
+    simulation.addEventListener("worldsim-step", async (event) => {
+      const view = event.detail;
+      const before = previousMetrics;
+      latestView = view;
+      renderMetrics(view, before);
+      setState(view, view.status === "completed" ? "Complete" : "Ready");
+      actionLabel.textContent = view.status === "completed" ? "Reached the end of the 40-year world" : "One half-year advanced";
+      await summarizeTrace(
+        Math.max(0, view.state.t - 1),
+        view.state.t,
+        `Step ${view.state.t}: events during this half-year.`,
+      );
+    });
+
+    simulation.addEventListener("worldsim-complete", async (event) => {
+      const view = event.detail;
+      latestView = view;
+
+      if (lastActivityEndT !== view.state.t) {
+        const before = previousMetrics;
+        renderMetrics(view, before);
+        await summarizeTrace(
+          interactionStartT,
+          view.state.t,
+          `Run summary: steps ${interactionStartT + 1}–${view.state.t}.`,
+        );
+      }
+
+      setState(view, "Complete");
+      actionLabel.textContent = "Reached the end of the 40-year world";
+      pendingAction = "complete";
+    });
+
+    simulation.addEventListener("worldsim-cancelled", async (event) => {
+      const view = event.detail;
+      const before = previousMetrics;
+      latestView = view;
+      renderMetrics(view, before);
+      setState(view, "Paused");
+      actionLabel.textContent = `Stopped at step ${view.state.t}`;
+      await summarizeTrace(interactionStartT, view.state.t, `Partial run summary through step ${view.state.t}.`);
+      pendingAction = "cancelled";
+    });
+
     simulation.addEventListener("worldsim-error", (event) => {
+      demoStatus.textContent = "Error";
+      actionLabel.textContent = event.detail?.message ?? "Unknown demo error";
       seedNote.textContent = `Demo error: ${event.detail?.message ?? "unknown error"}`;
     });
   </script>
