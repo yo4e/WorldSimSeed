@@ -1,4 +1,4 @@
-import type { MetricsResult, SimulationSnapshot } from "../core/index.js";
+import type { MetricsResult, SimulationSnapshot, TraceRecord } from "../core/index.js";
 import type { ResourceLimits, Scalar } from "../spec/index.js";
 import type {
   SerializedWorkerError,
@@ -96,6 +96,10 @@ export class WorldSimWorkerClient {
 
   getMetrics(): Promise<MetricsResult> {
     return this.request<MetricsResult>({ type: "getMetrics" });
+  }
+
+  getTrace(): Promise<TraceRecord[]> {
+    return this.request<TraceRecord[]>({ type: "getTrace" });
   }
 
   exportRun(): Promise<WebRunExport> {
