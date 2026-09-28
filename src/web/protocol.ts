@@ -62,6 +62,7 @@ export type WorkerRequest =
   | (RequestBase & { type: "cancel" })
   | (RequestBase & { type: "getState" })
   | (RequestBase & { type: "getMetrics" })
+  | (RequestBase & { type: "getTrace" })
   | (RequestBase & { type: "exportRun" });
 
 export interface WorkerSuccessResponse {

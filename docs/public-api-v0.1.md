@@ -93,10 +93,13 @@ await element.cancel();
 await element.reset({ seed: 42 });
 await element.getState();
 await element.getMetrics();
+await element.getTrace();
 await element.exportRun();
 ```
 
 Long runs execute in a module Worker. `cancel()` is cooperative at chunk boundaries; a cancelled run may be resumed from its current deterministic state. `src` fetching belongs to the embedding host and uses `credentials: "omit"`.
+
+`getTrace()` returns a defensive snapshot of retained trace records at the current simulation state. Trace capture must be enabled before load/reset. `exportRun()` remains a completed-run export and still rejects incomplete simulations.
 
 See [web embedding v0.1](web-embedding-v0.1.md) for Custom Events and host boundaries.
 

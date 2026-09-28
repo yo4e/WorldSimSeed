@@ -68,10 +68,13 @@ await element.run();
 await element.cancel();
 await element.getState();
 await element.getMetrics();
+await element.getTrace();
 await element.exportRun();
 ```
 
 `reset()` starts a new run. v0.1 does not support changing parameters in the middle of an existing run.
+
+`getTrace()` returns a defensive snapshot of trace records accumulated so far. Trace capture must be enabled with `element.trace = true` before load/reset for records to be retained. Reading trace does not advance or otherwise mutate the simulation.
 
 `exportRun()` requires the simulation to be complete and returns the resolved manifest, final state, metrics, and optional trace.
 
