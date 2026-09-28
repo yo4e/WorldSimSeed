@@ -1,0 +1,89 @@
+specVersion: "0.1"
+id: self-permission-luck
+title: Self-permission and luck thought experiment
+description: A deliberately small thought experiment where self-permission can add a tiny bias to otherwise random opportunities.
+
+parameters:
+  opportunityRate:
+    type: number
+    default: 0.10
+    min: 0
+    max: 1
+
+  permissionLuckBias:
+    type: number
+    default: 0
+    min: 0
+    max: 0.05
+
+  misfortuneRate:
+    type: number
+    default: 0.10
+    min: 0
+    max: 1
+
+time:
+  steps: 80
+  label: half-year
+
+agents:
+  count: 1000
+  state:
+    self_permission:
+      type: number
+      mutable: false
+      init:
+        distribution: uniform
+        min: 0
+        max: 1
+
+    wealth:
+      type: number
+      mutable: true
+      init: 10
+
+events:
+  - id: lucky_opportunity
+    scope: agent
+    chance: "clamp(param.opportunityRate + param.permissionLuckBias * agent.self_permission, 0, 1)"
+    effects:
+      - target: agent.wealth
+        op: multiply
+        value: 2
+
+  - id: misfortune
+    scope: agent
+    chance: "param.misfortuneRate"
+    effects:
+      - target: agent.wealth
+        op: multiply
+        value: 0.5
+
+observers:
+  - id: mean_wealth
+    type: mean
+    source: agent.wealth
+
+  - id: wealth_gini
+    type: gini
+    source: agent.wealth
+
+  - id: permission_wealth_correlation
+    type: correlation
+    x: agent.self_permission
+    y: agent.wealth
+
+  - id: wealth_p10
+    type: percentile
+    source: agent.wealth
+    q: 0.10
+
+  - id: wealth_p90
+    type: percentile
+    source: agent.wealth
+    q: 0.90
+
+  - id: wealth_histogram
+    type: histogram
+    source: agent.wealth
+    bins: 20
