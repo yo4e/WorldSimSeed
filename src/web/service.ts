@@ -60,6 +60,8 @@ export class WorldWorkerService {
           return success(request, this.requireSimulation().snapshot());
         case "getMetrics":
           return success(request, this.requireSimulation().metrics());
+        case "getTrace":
+          return success(request, this.requireSimulation().trace());
         case "exportRun":
           return success(request, this.exportRun());
       }
