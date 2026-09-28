@@ -24,9 +24,11 @@ Raw engine metrics remain available in a disclosure for inspection.
 
 ## Event summaries
 
-The Pages shell enables the existing trace option for this bounded reference world and uses `exportRun()` after interactions. Trace records are translated into compact counts such as lucky opportunities and misfortunes. This is presentation-only: the world spec, event probabilities, effects, Worker path, and deterministic seed semantics are unchanged.
+The Pages shell enables the existing trace option for this bounded reference world. Issue #22 exposed one small browser-API gap: `exportRun()` intentionally requires a completed simulation, so it cannot explain a single Step while the world is still running. The browser adapter therefore exposes a read-only `getTrace()` method backed by the core's existing `simulation.trace()` snapshot.
 
-The reference world stays comfortably below the v0.1 trace-record ceiling in ordinary runs.
+The demo uses `getTrace()` after interactions and translates trace records into compact counts such as lucky opportunities and misfortunes. The world spec, event probabilities, effects, Worker run loop, resource limits, and deterministic seed semantics are unchanged.
+
+The reference world stays comfortably below the v0.1 trace-record ceiling in ordinary runs. `exportRun()` keeps its completed-run-only contract.
 
 ## Why there is no time-series chart in this pass
 
