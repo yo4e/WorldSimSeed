@@ -12,11 +12,13 @@ WorldSimSeed は、**確率・エージェント・時間・イベント・観�
 
 ## Status
 
-**v0.1.0.**
+**最新公開版: [v0.1.0](https://github.com/yo4e/WorldSimSeed/releases/tag/v0.1.0)。mainには未リリースの追加があります。**
 
-Node/headless、batch runner、browser Worker、最小Web Component `<world-sim>` のvertical sliceをv0.1.0の基準線として公開します。resource limits、schema/runtime parity、security negative tests、package surface、公開API、既知制約をv0.1 contractとして固定し、GitHub Pagesで実ブラウザ経路のデモも公開しています。
+Node/headless、batch runner、browser Worker、最小Web Component `<world-sim>` のvertical sliceが公開済みv0.1.0の基準線です。resource limits、schema/runtime parity、security negative tests、package surface、公開API、既知制約をv0.1 contractとして固定し、GitHub Pagesで実ブラウザ経路のデモも公開しています。
 
-v0.1.0はGitHub Releaseとして公開し、`package.json` の `private: true` は維持します。npm publishはこのリリースには含みません。
+mainには、read-only `getTrace()` と分かりやすいデモ、self-permission実験、条件別 `groups` 集計、[3条件 × 同一20 seedsの実験記録](docs/research/2026-10-07-self-permission-epsilon-sweep/README.md)が追加されています。これらはv0.1.0タグには含まれません。Pagesデモはmainを反映します。
+
+現在のpackage/engine versionは `0.1.0`、`private: true` のままです。次の公開版は追加APIを含む `0.2.0` を提案していますが、まだversion更新・tag・release発行は行っていません。判断理由と後日の公開手順は[release status](docs/releases/next-release.md)、差分は[CHANGELOG](CHANGELOG.md#unreleased)を参照してください。npm publishは含みません。
 
 ## Core idea
 
@@ -284,7 +286,7 @@ WorldSimSeed is released under the [MIT License](LICENSE).
 
 ## Next starting point
 
-v0.1.0 establishes the first released baseline. Further work can improve the demo, visualization, ergonomics, integrations, and later world-spec capabilities while keeping the released v0.1 contract and known limitations explicit.
+The current checkpoint is complete after the documentation review. A [seed-sensitivity study is recorded on Issue #23](https://github.com/yo4e/WorldSimSeed/issues/23#issuecomment-6032191175) as backlog only; it is not scheduled, implemented, or required for a release. Further work should start from a separate decision while keeping the released contracts and known limitations explicit.
 
 ---
 

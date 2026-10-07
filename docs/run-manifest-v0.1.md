@@ -200,6 +200,8 @@ The runner expands parameter alternatives × seed sequence deterministically, ch
 
 ### Grouped summaries (Issue #26)
 
+These additive summaries are available on current main after the published v0.1.0 tag; they are an unreleased API addition. See [release status](releases/next-release.md).
+
 Top-level `aggregates` and `eventCount` remain pooled across every run, with unchanged
 count/mean/min/max semantics and `experimentVersion: "0.1"`. They are not deprecated.
 `groups` is an additive result field; request syntax and run ordering are unchanged.
