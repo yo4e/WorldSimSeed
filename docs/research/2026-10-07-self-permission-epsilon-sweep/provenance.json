@@ -1,0 +1,46 @@
+{
+  "startedAt": "2026-10-07T05:09:32.896Z",
+  "completedAt": "2026-10-07T05:09:45.257Z",
+  "node": "v22.22.0",
+  "engineVersion": "0.1.0",
+  "commit": "f9c7175e6666c2f7107c18d82294ec96c76f3b96",
+  "specHash": "sha256:ef58d7b1170cf306ee5c200f7141bb908379caf855971355cdeb0b14823ea2a6",
+  "sourceSha256": "1428a3590cf886e46b622716da98d9b3b26ca228a5dba3c9f1437ba2727947b5",
+  "resultSha256": "47cff9dce9c7c2f3abd5b430e08585a28d130f4b4556bdd82b9410749f33faf8",
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61
+  ],
+  "biases": [
+    0,
+    0.0001,
+    0.001
+  ],
+  "agents": 1000,
+  "steps": 80,
+  "limits": {
+    "maxAgents": 5000,
+    "maxSteps": 500,
+    "maxEvents": 1000000,
+    "maxTraceRecords": 50000,
+    "maxRuns": 100
+  }
+}

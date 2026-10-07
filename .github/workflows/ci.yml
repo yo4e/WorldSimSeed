@@ -30,6 +30,11 @@ jobs:
       - name: Test
         run: npm test
 
+      - name: Reproduce recorded epsilon sweep
+        run: |
+          node scripts/reproduce-epsilon-sweep.mjs "$RUNNER_TEMP/epsilon-sweep" > "$RUNNER_TEMP/epsilon-sweep.log"
+          python3 scripts/verify-epsilon-sweep.py "$RUNNER_TEMP/epsilon-sweep"
+
       - name: Node release benchmark
         run: npm run benchmark:release
 

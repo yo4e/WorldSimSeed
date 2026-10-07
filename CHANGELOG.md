@@ -8,6 +8,7 @@ The project follows Semantic Versioning for releases. During the `0.x` period, m
 
 ### Added
 
+- Recorded the self-permission luck epsilon sweep (three conditions × twenty paired seeds), machine-readable evidence, and reproduction/independent validation scripts.
 - Experiment `groups` and CLI summaries by complete resolved parameter set, with deterministic JSON keys, numeric observer/event aggregates, and run/seed provenance. Existing pooled aggregates, requests, and simulation semantics remain unchanged (#26).
 
 ## [0.1.0] - 2026-09-25

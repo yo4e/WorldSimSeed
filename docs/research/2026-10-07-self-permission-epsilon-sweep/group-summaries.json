@@ -1,0 +1,273 @@
+{
+  "experimentVersion": "0.1",
+  "world": {
+    "id": "self-permission-luck",
+    "specHash": "sha256:ef58d7b1170cf306ee5c200f7141bb908379caf855971355cdeb0b14823ea2a6"
+  },
+  "runCount": 60,
+  "eventCount": {
+    "count": 60,
+    "mean": 16079.683333333332,
+    "min": 15895,
+    "max": 16256
+  },
+  "aggregates": {
+    "mean_wealth": {
+      "count": 60,
+      "mean": 289.0731207122802,
+      "min": 156.20187622070313,
+      "max": 552.201689453125
+    },
+    "wealth_gini": {
+      "count": 60,
+      "mean": 0.9189632607938283,
+      "min": 0.8692362399263094,
+      "max": 0.9619764111402846
+    },
+    "permission_wealth_correlation": {
+      "count": 60,
+      "mean": 0.0010168810394644132,
+      "min": -0.04660483827939079,
+      "max": 0.048281166942739165
+    }
+  },
+  "groups": [
+    {
+      "key": "{\"misfortuneRate\":0.1,\"opportunityRate\":0.1,\"permissionLuckBias\":0.0001}",
+      "parameters": {
+        "misfortuneRate": 0.1,
+        "opportunityRate": 0.1,
+        "permissionLuckBias": 0.0001
+      },
+      "runCount": 20,
+      "runIndices": [
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39
+      ],
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61
+      ],
+      "aggregates": {
+        "mean_wealth": {
+          "count": 20,
+          "mean": 286.2584087982178,
+          "min": 157.66187622070314,
+          "max": 549.676513671875
+        },
+        "wealth_gini": {
+          "count": 20,
+          "mean": 0.9188297361324919,
+          "min": 0.870661024418981,
+          "max": 0.961841612844913
+        },
+        "permission_wealth_correlation": {
+          "count": 20,
+          "mean": 0.00019925500642030137,
+          "min": -0.04647540500722712,
+          "max": 0.04452604775935326
+        }
+      },
+      "eventCount": {
+        "count": 20,
+        "mean": 16068.65,
+        "min": 15900,
+        "max": 16210
+      }
+    },
+    {
+      "key": "{\"misfortuneRate\":0.1,\"opportunityRate\":0.1,\"permissionLuckBias\":0.001}",
+      "parameters": {
+        "misfortuneRate": 0.1,
+        "opportunityRate": 0.1,
+        "permissionLuckBias": 0.001
+      },
+      "runCount": 20,
+      "runIndices": [
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59
+      ],
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61
+      ],
+      "aggregates": {
+        "mean_wealth": {
+          "count": 20,
+          "mean": 295.1067837982178,
+          "min": 161.4803271484375,
+          "max": 552.201689453125
+        },
+        "wealth_gini": {
+          "count": 20,
+          "mean": 0.9190912655853042,
+          "min": 0.8692362399263094,
+          "max": 0.9611661061765657
+        },
+        "permission_wealth_correlation": {
+          "count": 20,
+          "mean": 0.002724267672693177,
+          "min": -0.04442631724873814,
+          "max": 0.048281166942739165
+        }
+      },
+      "eventCount": {
+        "count": 20,
+        "mean": 16106.2,
+        "min": 15935,
+        "max": 16256
+      }
+    },
+    {
+      "key": "{\"misfortuneRate\":0.1,\"opportunityRate\":0.1,\"permissionLuckBias\":0}",
+      "parameters": {
+        "misfortuneRate": 0.1,
+        "opportunityRate": 0.1,
+        "permissionLuckBias": 0
+      },
+      "runCount": 20,
+      "runIndices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61
+      ],
+      "aggregates": {
+        "mean_wealth": {
+          "count": 20,
+          "mean": 285.8541695404053,
+          "min": 156.20187622070313,
+          "max": 548.954013671875
+        },
+        "wealth_gini": {
+          "count": 20,
+          "mean": 0.9189687806636879,
+          "min": 0.870692528385729,
+          "max": 0.9619764111402846
+        },
+        "permission_wealth_correlation": {
+          "count": 20,
+          "mean": 0.00012712043927975996,
+          "min": -0.04660483827939079,
+          "max": 0.044488360077848954
+        }
+      },
+      "eventCount": {
+        "count": 20,
+        "mean": 16064.2,
+        "min": 15895,
+        "max": 16205
+      }
+    }
+  ]
+}

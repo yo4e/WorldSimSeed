@@ -279,6 +279,7 @@ WorldSimSeed is released under the [MIT License](LICENSE).
 
 ## Research
 
+- [Self-permission luck epsilon比較実験（2026-10-07）](docs/research/2026-10-07-self-permission-epsilon-sweep/README.md) — 3条件 × 同一20 seeds、条件別集計・paired delta・再現手順。
 - [類似OSS・製品・研究環境の調査と暫定判断（2026-08-22）](docs/research/2026-08-22-simulation-landscape.md)
 
 ## Next starting point
