@@ -312,6 +312,11 @@ observers:
   const b = runExperiment(compiled, request, LIMITS);
 
   assert.equal(a.runCount, 4);
+  assert.deepEqual(a.groups.map((group) => group.key),
+    ['{"enabled":false}', '{"enabled":true}']);
+  assert.deepEqual(a.groups[0].runIndices, [2, 3]);
+  assert.deepEqual(a.groups[0].eventCount, { count: 2, mean: 0, min: 0, max: 0 });
+  assert.deepEqual(a.groups[0].aggregates.mean_x, { count: 2, mean: 0, min: 0, max: 0 });
   assert.deepEqual(a, b);
   assert.equal(a.runs.filter((run) => run.trace !== undefined).length, 2);
   assert.deepEqual(

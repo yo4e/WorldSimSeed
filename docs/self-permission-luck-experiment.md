@@ -67,11 +67,15 @@ The raw experiment result contains both parameter values and the same seed seque
 
 ## v0.1 friction discovered
 
-`runExperiment()` currently computes top-level numeric `aggregates` across **all** parameter sets in the request. For this two-scenario experiment, an aggregate therefore contains 40 values rather than separate 20-run summaries for baseline and biased scenarios.
+`runExperiment()` keeps top-level numeric `aggregates` and `eventCount` pooled across
+all 40 runs for compatibility. Its additive `groups` field provides two separate
+20-run summaries keyed by the complete resolved parameter set, including defaults.
+Each group summarizes mean wealth, Gini, correlation, percentiles, and event counts.
+`runIndices` and `seeds` connect each summary to the canonical detailed runs.
 
-The underlying per-run records preserve parameter values and seeds, so the paired comparison is possible without changing simulation semantics. However, a reusable experiment-analysis layer would benefit from grouped aggregates, for example by parameter set or scenario key.
-
-This is a candidate v0.2 requirement rather than a reason to widen the v0.1 engine during this experiment.
+Paired deltas can still be reconstructed by matching the same seed across groups;
+automatic paired-delta summaries and named scenarios are deferred. See the
+[grouped-result contract](run-manifest-v0.1.md#grouped-summaries-issue-26).
 
 ## Scope after this experiment
 

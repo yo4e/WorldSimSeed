@@ -86,6 +86,7 @@ async function runBatch(file) {
         experimentVersion: result.experimentVersion,
         world: result.world,
         runCount: result.runCount,
+        groups: result.groups,
         aggregates: result.aggregates,
         eventCount: result.eventCount,
         tracedRuns,
