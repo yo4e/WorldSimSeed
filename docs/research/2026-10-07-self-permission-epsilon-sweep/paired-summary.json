@@ -1,0 +1,158 @@
+[
+  {
+    "from": 0,
+    "to": 0.0001,
+    "metrics": {
+      "mean_wealth": {
+        "count": 20,
+        "mean": 0.40423925781249465,
+        "min": 0.0003125000000068212,
+        "max": 1.460000000000008,
+        "median": 0.3050292968749915,
+        "sampleSD": 0.36072906395516874,
+        "positive": 20,
+        "zero": 0,
+        "negative": 0
+      },
+      "wealth_gini": {
+        "count": 20,
+        "mean": -0.00013904453119640837,
+        "min": -0.000482139488926725,
+        "max": 0.000355174391322155,
+        "median": -0.00013862299368472275,
+        "sampleSD": 0.0001670338532260216,
+        "positive": 1,
+        "zero": 0,
+        "negative": 19
+      },
+      "permission_wealth_correlation": {
+        "count": 20,
+        "mean": 0.00007213456714054241,
+        "min": -0.0003414143933942182,
+        "max": 0.0006631783845308659,
+        "median": 0.00006373988690979186,
+        "sampleSD": 0.0001822070052274828,
+        "positive": 16,
+        "zero": 0,
+        "negative": 4
+      },
+      "eventCount": {
+        "count": 20,
+        "mean": 4.45,
+        "min": 1,
+        "max": 9,
+        "median": 5,
+        "sampleSD": 2.08944716939295,
+        "positive": 20,
+        "zero": 0,
+        "negative": 0
+      }
+    },
+    "largestWealthDeltaSeed": 56,
+    "largestWealthDeltaShare": 0.18058612217683534
+  },
+  {
+    "from": 0,
+    "to": 0.001,
+    "metrics": {
+      "mean_wealth": {
+        "count": 20,
+        "mean": 9.252614257812496,
+        "min": 1.5002539062499807,
+        "max": 32.66863281249999,
+        "median": 5.884736328125001,
+        "sampleSD": 8.579926302926946,
+        "positive": 20,
+        "zero": 0,
+        "negative": 0
+      },
+      "wealth_gini": {
+        "count": 20,
+        "mean": 0.0001224849216158952,
+        "min": -0.001863078101554283,
+        "max": 0.009569924328080237,
+        "median": -0.000617795871368898,
+        "sampleSD": 0.0025319931701692742,
+        "positive": 6,
+        "zero": 0,
+        "negative": 14
+      },
+      "permission_wealth_correlation": {
+        "count": 20,
+        "mean": 0.002597147233413417,
+        "min": -0.004966120243278097,
+        "max": 0.012663119202083635,
+        "median": 0.0016521017402812668,
+        "sampleSD": 0.003684392827599514,
+        "positive": 18,
+        "zero": 0,
+        "negative": 2
+      },
+      "eventCount": {
+        "count": 20,
+        "mean": 42,
+        "min": 34,
+        "max": 51,
+        "median": 41,
+        "sampleSD": 4.622598950009786,
+        "positive": 20,
+        "zero": 0,
+        "negative": 0
+      }
+    },
+    "largestWealthDeltaSeed": 54,
+    "largestWealthDeltaShare": 0.1765373109816831
+  },
+  {
+    "from": 0.0001,
+    "to": 0.001,
+    "metrics": {
+      "mean_wealth": {
+        "count": 20,
+        "mean": 8.848375,
+        "min": 1.459628906249975,
+        "max": 32.0073828125,
+        "median": 5.4486865234374875,
+        "sampleSD": 8.57904048847759,
+        "positive": 20,
+        "zero": 0,
+        "negative": 0
+      },
+      "wealth_gini": {
+        "count": 20,
+        "mean": 0.00026152945281230353,
+        "min": -0.001777631958324255,
+        "max": 0.009932970832104537,
+        "median": -0.0005305368068401206,
+        "sampleSD": 0.0025849802543461966,
+        "positive": 6,
+        "zero": 0,
+        "negative": 14
+      },
+      "permission_wealth_correlation": {
+        "count": 20,
+        "mean": 0.0025250126662728746,
+        "min": -0.004947302454404734,
+        "max": 0.012533685929919963,
+        "median": 0.0015746210253768786,
+        "sampleSD": 0.003685036557806485,
+        "positive": 19,
+        "zero": 0,
+        "negative": 1
+      },
+      "eventCount": {
+        "count": 20,
+        "mean": 37.55,
+        "min": 29,
+        "max": 49,
+        "median": 36.5,
+        "sampleSD": 4.751454071068528,
+        "positive": 20,
+        "zero": 0,
+        "negative": 0
+      }
+    },
+    "largestWealthDeltaSeed": 54,
+    "largestWealthDeltaShare": 0.18086588109398613
+  }
+]

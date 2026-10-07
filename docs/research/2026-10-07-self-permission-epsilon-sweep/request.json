@@ -1,0 +1,27 @@
+{
+  "experimentVersion": "0.1",
+  "world": "../../../examples/self-permission-luck.world.yaml",
+  "parameters": {
+    "permissionLuckBias": [
+      0,
+      0.0001,
+      0.001
+    ]
+  },
+  "runs": {
+    "seeds": {
+      "base": 42,
+      "count": 20
+    }
+  },
+  "trace": {
+    "mode": "none"
+  },
+  "limits": {
+    "maxAgents": 5000,
+    "maxSteps": 500,
+    "maxRuns": 60,
+    "maxEvents": 1000000,
+    "maxTraceRecords": 100000
+  }
+}

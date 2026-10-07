@@ -1,0 +1,19 @@
+{
+  "status": "passed",
+  "totalRuns": 60,
+  "replayRuns": 60,
+  "directTraceRuns": 60,
+  "checks": [
+    "exact batch replay",
+    "3 groups of 20 and seed identity",
+    "finite metrics and bounds",
+    "independent per-group and pooled count/mean/min/max",
+    "paired delta mean = group mean difference",
+    "direct-run metrics/event parity",
+    "trace count = eventCount",
+    "all seeds: unchanged self_permission and misfortune counts",
+    "all seeds/agents: nondecreasing wealth with increasing bias",
+    "nondecreasing opportunity counts"
+  ],
+  "independentPythonSavedArtifactVerification": "passed"
+}

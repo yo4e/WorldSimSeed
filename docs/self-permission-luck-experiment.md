@@ -77,6 +77,10 @@ Paired deltas can still be reconstructed by matching the same seed across groups
 automatic paired-delta summaries and named scenarios are deferred. See the
 [grouped-result contract](run-manifest-v0.1.md#grouped-summaries-issue-26).
 
+## Recorded epsilon sweep
+
+[2026-10-07 comparison](research/2026-10-07-self-permission-epsilon-sweep/README.md) records bias 0 / 0.0001 / 0.001 for the same twenty seeds, with grouped summaries, seed-level paired deltas, provenance, and reproduction/independent verification scripts. These are descriptive results within this model.
+
 ## Scope after this experiment
 
 This pass intentionally does not model:
