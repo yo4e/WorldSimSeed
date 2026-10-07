@@ -27,7 +27,7 @@ WorldSimSeed v0.1 deliberately keeps a narrow execution model. These limits are 
 
 - Parameter expansion is an in-memory Cartesian product.
 - Per-run manifests and metrics are retained in the returned batch result, so a high host-selected `maxRuns` increases memory use.
-- Numeric aggregates are count/mean/min/max only.
+- Numeric aggregates are count/mean/min/max only. Current main adds per-resolved-parameter `groups` alongside pooled summaries; named scenarios and automatic paired-delta summaries remain deferred. See [release status](releases/next-release.md) for unreleased additions.
 - Selected trace retention is selected by seed, not by an arbitrary predicate over parameter combinations.
 - There is no distributed execution, streaming result sink, checkpointing, or resume file format.
 

@@ -1,6 +1,6 @@
 # Public API v0.1
 
-This document defines the public package surface for WorldSimSeed v0.1.0. Files below `dist/` that are not reachable through these package exports are implementation details.
+This document defines the public package surface for the v0.1 world/manifest contract. The published baseline is v0.1.0; current main also documents unreleased API additions. `getTrace()` and batch `groups` were added after the v0.1.0 tag. See [release status](releases/next-release.md) for the distinction. Files below `dist/` that are not reachable through these package exports are implementation details.
 
 ## Package entry points
 
@@ -78,6 +78,8 @@ A seed, effective parameters, step target, and host resource limits are explicit
 - emitted event count.
 
 `validateExperimentRequest()` and `runExperiment()` implement batch execution. Batch expansion is parameter Cartesian product × seed sequence and is bounded by `maxRuns` before execution.
+
+On current main, the additive `ExperimentGroup` / `ExperimentResult.groups` API provides summaries by the complete resolved parameter set, deterministic JSON keys, run indexes, and seeds. Top-level `aggregates` and `eventCount` remain pooled. Numeric per-run mean/Gini/correlation observers and event counts use count/mean/min/max summaries; simulation semantics and request syntax are unchanged. These groups are not present in the published v0.1.0 tag. See the [group contract](run-manifest-v0.1.md#grouped-summaries-issue-26).
 
 ## Web API
 

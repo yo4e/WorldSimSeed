@@ -8,8 +8,15 @@ The project follows Semantic Versioning for releases. During the `0.x` period, m
 
 ### Added
 
+- Read-only browser trace inspection through `getTrace()`, plus a human-readable Talent × Luck demo and trace-based event explanations (#24).
+- Minimal self-permission luck world and paired same-seed experiment, with replay/monotonicity checks and explicit model-only interpretation (#25).
 - Recorded the self-permission luck epsilon sweep (three conditions × twenty paired seeds), machine-readable evidence, and reproduction/independent validation scripts.
 - Experiment `groups` and CLI summaries by complete resolved parameter set, with deterministic JSON keys, numeric observer/event aggregates, and run/seed provenance. Existing pooled aggregates, requests, and simulation semantics remain unchanged (#26).
+
+### Documentation
+
+- Distinguished published v0.1.0 from unreleased main additions; documented proposed next release 0.2.0 and the unchanged world/experiment format versions.
+- Recorded the next seed-sensitivity study on existing Issue #23 as deferred research, without executing it.
 
 ## [0.1.0] - 2026-09-25
 
