@@ -4,6 +4,12 @@ All notable changes to WorldSimSeed will be documented in this file.
 
 The project follows Semantic Versioning for releases. During the `0.x` period, minor releases may intentionally change unstable public APIs or the world-spec contract; such changes must be documented.
 
+## [Unreleased]
+
+### Added
+
+- Experiment `groups` and CLI summaries by complete resolved parameter set, with deterministic JSON keys, numeric observer/event aggregates, and run/seed provenance. Existing pooled aggregates, requests, and simulation semantics remain unchanged (#26).
+
 ## [0.1.0] - 2026-09-25
 
 ### Added

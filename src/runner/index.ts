@@ -182,6 +182,18 @@ export interface ExperimentRunRecord {
   trace?: TraceRecord[];
 }
 
+export interface ExperimentGroup {
+  /** JSON object with resolved parameter names sorted lexicographically. */
+  key: string;
+  parameters: Readonly<Record<string, Scalar>>;
+  runCount: number;
+  /** Zero-based indexes into ExperimentResult.runs, in execution order. */
+  runIndices: number[];
+  seeds: number[];
+  aggregates: Record<string, BatchAggregate>;
+  eventCount: BatchAggregate;
+}
+
 export interface ExperimentResult {
   experimentVersion: "0.1";
   world: {
@@ -190,6 +202,7 @@ export interface ExperimentResult {
   };
   runCount: number;
   runs: ExperimentRunRecord[];
+  groups: ExperimentGroup[];
   aggregates: Record<string, BatchAggregate>;
   eventCount: BatchAggregate;
 }
@@ -368,9 +381,64 @@ export function runExperiment(
     },
     runCount,
     runs,
+    groups: summarizeGroups(runs),
     aggregates,
     eventCount: summarizeNumbers(eventCounts),
   };
+}
+
+function summarizeGroups(runs: ExperimentRunRecord[]): ExperimentGroup[] {
+  const groups = new Map<string, {
+    parameters: Record<string, Scalar>;
+    runIndices: number[];
+    seeds: number[];
+    numericValues: Record<string, number[]>;
+    eventCounts: number[];
+  }>();
+
+  runs.forEach((run, index) => {
+    const parameters: Record<string, Scalar> = Object.create(null);
+    for (const name of Object.keys(run.manifest.parameters).sort()) {
+      parameters[name] = run.manifest.parameters[name]!;
+    }
+    const key = JSON.stringify(parameters);
+    let group = groups.get(key);
+    if (!group) {
+      group = {
+        parameters,
+        runIndices: [],
+        seeds: [],
+        numericValues: Object.create(null),
+        eventCounts: [],
+      };
+      groups.set(key, group);
+    }
+    group.runIndices.push(index);
+    group.seeds.push(run.manifest.seed);
+    group.eventCounts.push(run.eventCount);
+    for (const [id, value] of Object.entries(run.metrics.values)) {
+      if (typeof value !== "number" || !Number.isFinite(value)) continue;
+      (group.numericValues[id] ??= []).push(value);
+    }
+  });
+
+  return [...groups.entries()]
+    .sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0)
+    .map(([key, group]) => {
+      const aggregates: Record<string, BatchAggregate> = Object.create(null);
+      for (const [id, values] of Object.entries(group.numericValues)) {
+        aggregates[id] = summarizeNumbers(values);
+      }
+      return {
+        key,
+        parameters: group.parameters,
+        runCount: group.runIndices.length,
+        runIndices: group.runIndices,
+        seeds: group.seeds,
+        aggregates,
+        eventCount: summarizeNumbers(group.eventCounts),
+      };
+    });
 }
 
 function validateSeedRequest(

@@ -193,9 +193,38 @@ Accordingly, `RunManifest.result.status` has only `completed` in v0.1. Future ve
 - resolved run count,
 - each completed run's manifest, metrics, event count, and optional selected trace,
 - count/mean/min/max aggregates for numeric observers,
-- aggregate emitted-event count.
+- aggregate emitted-event count,
+- additive `groups` summaries by the complete resolved parameter set (including defaults).
 
 The runner expands parameter alternatives × seed sequence deterministically, checks the total against `maxRuns` before executing, and preserves deterministic replay ordering.
+
+### Grouped summaries (Issue #26)
+
+Top-level `aggregates` and `eventCount` remain pooled across every run, with unchanged
+count/mean/min/max semantics and `experimentVersion: "0.1"`. They are not deprecated.
+`groups` is an additive result field; request syntax and run ordering are unchanged.
+The CLI experiment summary also includes `groups`.
+
+Each group contains `key`, `parameters`, `runCount`, `runIndices`, `seeds`,
+`aggregates`, and `eventCount`. The key is a JSON object serialized with resolved
+parameter names sorted lexicographically, for example
+`{"misfortuneRate":0.01,"opportunityRate":0.02,"permissionLuckBias":0}`.
+It identifies parameters within an experiment; world identity remains in `world`.
+Groups are sorted lexicographically by key, independently of matrix input order.
+`runIndices` are zero-based references into the canonical `runs` array and `seeds`
+retain execution order and duplicates. Repeated identical parameter alternatives
+merge into one group without dropping runs. Omitted and explicitly supplied defaults
+produce the same key. JSON numeric identity treats negative zero as zero.
+
+Every finite numeric observer (including per-run mean, Gini, correlation and
+percentiles) receives count/mean/min/max across that group's runs; nonnumeric or
+nonfinite observer results are omitted as in pooled summaries. These are summaries
+of per-run statistics, not statistics recomputed over pooled agent populations.
+Event counts receive the same summary. A two-parameter-set × twenty-seed request
+therefore retains pooled counts of 40 and exposes two groups of 20.
+
+Named scenarios and automatic paired-delta summaries remain deferred. Hosts can
+label groups using `parameters` and pair canonical run records by seed.
 
 ## Browser/headless acceptance rule
 

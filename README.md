@@ -212,6 +212,8 @@ v0.1 experiment requests can expand parameter alternatives × seed sets into rep
 npm run demo:batch
 ```
 
+The batch runner adds `groups` with separate numeric observer/event-count summaries per complete resolved parameter set, deterministic JSON keys, and run/seed references; top-level summaries remain pooled for compatibility. See the [grouped-result contract](docs/run-manifest-v0.1.md#grouped-summaries-issue-26).
+
 The batch runner keeps a resolved manifest and metrics per run, reports aggregate count/mean/min/max for numeric observers, enforces `maxRuns` before execution, rejects unknown/out-of-range parameter requests, rejects derived seed overflow, and can retain trace only for selected seeds.
 
 See [run manifest / experiment request v0.1](docs/run-manifest-v0.1.md) and the [reference-model validation notes](docs/reference-model-v0.1.md).
